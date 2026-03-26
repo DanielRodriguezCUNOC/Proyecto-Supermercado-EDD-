@@ -11,6 +11,10 @@ qt_add_executable(Proyecto1-EDD-1S-2026
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+
+    pantallasistema.h pantallasistema.cpp pantallasistema.ui
+
+
 )
 
 target_link_libraries(Proyecto1-EDD-1S-2026
