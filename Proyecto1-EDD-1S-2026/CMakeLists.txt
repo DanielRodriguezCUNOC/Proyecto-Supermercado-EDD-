@@ -13,8 +13,14 @@ qt_add_executable(Proyecto1-EDD-1S-2026
     mainwindow.ui
 
     pantallasistema.h pantallasistema.cpp pantallasistema.ui
+    customgraphics.h customgraphics.cpp
 
 
+)
+
+target_include_directories(Proyecto1-EDD-1S-2026
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(Proyecto1-EDD-1S-2026
