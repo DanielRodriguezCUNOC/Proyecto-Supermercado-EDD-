@@ -8,9 +8,36 @@ qt_standard_project_setup()
 qt_add_executable(Proyecto1-EDD-1S-2026
     WIN32 MACOSX_BUNDLE
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    view/pantallas/mainwindow.cpp
+    view/pantallas/mainwindow.h
+    view/pantallas/mainwindow.ui
+
+    view/pantallas/pantallasistema.h
+    view/pantallas/pantallasistema.cpp
+    view/pantallas/pantallasistema.ui
+    view/widgets/customgraphics.h
+    view/widgets/customgraphics.cpp
+    model/estructuras/listaenlazadanoordenada.h model/estructuras/listaenlazadanoordenada.cpp
+    model/estructuras/listaenlazadaordenada.h model/estructuras/listaenlazadaordenada.cpp
+    model/estructuras/arbolb.h model/estructuras/arbolb.cpp
+    model/estructuras/arbolbplus.h model/estructuras/arbolbplus.cpp
+    model/entidades/nodo.h model/entidades/nodo.cpp
+    model/entidades/product.h model/entidades/product.cpp
+    controller/viewcontroller.h controller/viewcontroller.cpp
+    controller/filecontroller.h controller/filecontroller.cpp
+    controller/estructurascontroller.h controller/estructurascontroller.cpp
+    controller/appcontroller.h controller/appcontroller.cpp
+    controller/buscarcontroller.h controller/buscarcontroller.cpp
+    model/estructuras/arbolavl.h model/estructuras/arbolavl.cpp
+
+)
+
+target_include_directories(Proyecto1-EDD-1S-2026
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/model
+        ${CMAKE_CURRENT_SOURCE_DIR}/controller
+        ${CMAKE_CURRENT_SOURCE_DIR}/view
 )
 
 target_link_libraries(Proyecto1-EDD-1S-2026
