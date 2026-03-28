@@ -212,3 +212,7 @@ void PantallaSistema::mostrarArboles()
     ui->gvArbolB->fitInView(scene3->itemsBoundingRect(), Qt::KeepAspectRatio);
     ui->gvArbolBPlus->fitInView(scene4->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
+
+void PantallaSistema::btnAgregarClicked(){
+    emit agregarProducto();
+}

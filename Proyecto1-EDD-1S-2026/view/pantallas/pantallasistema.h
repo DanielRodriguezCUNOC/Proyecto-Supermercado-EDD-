@@ -12,10 +12,6 @@ class PantallaSistema : public QWidget
 {
     Q_OBJECT
 
-public:
-    explicit PantallaSistema(QWidget *parent = nullptr);
-    ~PantallaSistema();
-
 private:
     Ui::PantallaSistema *ui;
     void mostrarArboles();
@@ -26,6 +22,15 @@ private:
 
 private slots:
     void actualizarReloj();
+    void btnAgregarClicked();
+
+public:
+    explicit PantallaSistema(QWidget *parent = nullptr);
+    ~PantallaSistema();
+
+signals:
+    void agregarProducto();
+
 };
 
 #endif // PANTALLASISTEMA_H
