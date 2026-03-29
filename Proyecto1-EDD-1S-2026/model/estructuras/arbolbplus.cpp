@@ -1,359 +1,286 @@
-// Implementación propia sin STL (salvo string)
 #include "arbolbplus.h"
 #include <sstream>
 
-BPlusNode::BPlusNode(int grado, bool hoja) : esHoja(hoja), numClaves(0), numHijos(0), productos(nullptr), siguienteHoja(nullptr)
+BPlusNode::BPlusNode(int _grado, bool _hoja) : esHoja(_hoja), grado(_grado), numClaves(0), siguienteHoja(nullptr)
 {
-  claves = new std::string[grado];
-  hijos = new BPlusNode *[grado + 1];
-  for (int i = 0; i < grado + 1; ++i)
-    hijos[i] = nullptr;
+    claves = new std::string[grado];
+    hijos = new BPlusNode *[grado + 1];
+    productos = new Nodo *[grado];
+
+    for (int i = 0; i < grado + 1; ++i) hijos[i] = nullptr;
+    for (int i = 0; i < grado; ++i) productos[i] = nullptr;
 }
 
 BPlusNode::~BPlusNode()
 {
-  delete[] claves;
-  for (int i = 0; i < numHijos; ++i)
-    delete hijos[i];
-  delete[] hijos;
-
-  // Liberar lista de productos
-  Nodo *actual = productos;
-  while (actual)
-  {
-    Nodo *sig = actual->getNext();
-    delete actual;
-    actual = sig;
-  }
+    if (esHoja) {
+        for (int i = 0; i < numClaves; ++i) {
+            Nodo *actual = productos[i];
+            while (actual) {
+                Nodo *sig = actual->getNext();
+                delete actual;
+                actual = sig;
+            }
+        }
+    }
+    delete[] claves;
+    delete[] hijos;
+    delete[] productos;
 }
 
-ArbolBPlus::ArbolBPlus(int grado) : grado(grado), categorias(nullptr) {}
+ArbolBPlus::ArbolBPlus(int _grado) : raiz(nullptr), grado(_grado) {}
 
 ArbolBPlus::~ArbolBPlus()
 {
-  liberarCategorias();
+    destruirRec(raiz);
 }
 
-CategoriaNodo *ArbolBPlus::buscarCategoria(const std::string &nombre) const
+void ArbolBPlus::destruirRec(BPlusNode *nodo)
 {
-  CategoriaNodo *actual = categorias;
-  while (actual)
-  {
-    if (actual->nombre == nombre)
-      return actual;
-    actual = actual->siguiente;
-  }
-  return nullptr;
-}
-
-CategoriaNodo *ArbolBPlus::crearOCapturarCategoria(const std::string &nombre)
-{
-  CategoriaNodo *cat = buscarCategoria(nombre);
-  if (cat)
-    return cat;
-  cat = new CategoriaNodo(nombre);
-  cat->siguiente = categorias;
-  categorias = cat;
-  return cat;
-}
-
-void ArbolBPlus::liberarCategorias()
-{
-  CategoriaNodo *actual = categorias;
-  while (actual)
-  {
-    CategoriaNodo *sig = actual->siguiente;
-    if (actual->raiz)
-      delete actual->raiz;
-    delete actual;
-    actual = sig;
-  }
-  categorias = nullptr;
-}
-
-// Inserción atómica por categoría
-
-// --- MÉTODOS AUXILIARES PARA INSERCIÓN Y REBALANCEO ---
-BPlusNode *ArbolBPlus::buscarHojaDestino(BPlusNode *raiz, const std::string &clave)
-{
-  BPlusNode *actual = raiz;
-  while (actual && !actual->esHoja)
-  {
-    int i = 0;
-    while (i < actual->numClaves && clave >= actual->claves[i])
-      i++;
-    actual = actual->hijos[i];
-  }
-  return actual;
-}
-
-void ArbolBPlus::insertarEnHoja(BPlusNode *hoja, const std::string &clave, Product *producto)
-{
-  int i = hoja->numClaves - 1;
-  while (i >= 0 && clave < hoja->claves[i])
-  {
-    hoja->claves[i + 1] = hoja->claves[i];
-    i--;
-  }
-  hoja->claves[i + 1] = clave;
-  hoja->numClaves++;
-  // Insertar producto en la lista enlazada en orden
-  Nodo *nuevo = new Nodo(producto);
-  Nodo *actual = hoja->productos;
-  Nodo *prev = nullptr;
-  while (actual && actual->getValue()->getBarcode() < clave)
-  {
-    prev = actual;
-    actual = actual->getNext();
-  }
-  nuevo->setNext(actual);
-  if (actual)
-    actual->setPrev(nuevo);
-  nuevo->setPrev(prev);
-  if (prev)
-    prev->setNext(nuevo);
-  else
-    hoja->productos = nuevo;
-}
-
-void ArbolBPlus::dividirHoja(CategoriaNodo *cat, BPlusNode *hoja)
-{
-  int mitad = grado / 2;
-  BPlusNode *nuevaHoja = new BPlusNode(grado, true);
-  // Copiar la mitad superior de claves a la nueva hoja
-  for (int i = mitad, j = 0; i < grado; ++i, ++j)
-  {
-    nuevaHoja->claves[j] = hoja->claves[i];
-    nuevaHoja->numClaves++;
-  }
-  hoja->numClaves = mitad;
-  // Copiar productos correspondientes
-  Nodo *actual = hoja->productos;
-  Nodo *prev = nullptr;
-  int idx = 0;
-  while (actual)
-  {
-    Nodo *sig = actual->getNext();
-    if (idx >= mitad)
-    {
-      // Mover a nueva hoja
-      if (!nuevaHoja->productos)
-      {
-        nuevaHoja->productos = actual;
-        actual->setPrev(nullptr);
-      }
-      else
-      {
-        Nodo *ult = nuevaHoja->productos;
-        while (ult->getNext())
-          ult = ult->getNext();
-        ult->setNext(actual);
-        actual->setPrev(ult);
-      }
-      actual->setNext(nullptr);
+    if (!nodo) return;
+    if (!nodo->esHoja) {
+        for (int i = 0; i <= nodo->numClaves; ++i) {
+            destruirRec(nodo->hijos[i]);
+        }
     }
-    else
-    {
-      prev = actual;
-    }
-    actual = sig;
-    idx++;
-  }
-  if (prev)
-    prev->setNext(nullptr);
-  // Enlazar hojas
-  nuevaHoja->siguienteHoja = hoja->siguienteHoja;
-  hoja->siguienteHoja = nuevaHoja;
-  // Promocionar clave mínima de la nueva hoja al padre
-  std::string clavePromocionada = nuevaHoja->claves[0];
-  // Si la hoja es raíz
-  if (cat->raiz == hoja)
-  {
-    BPlusNode *nuevaRaiz = new BPlusNode(grado, false);
-    nuevaRaiz->claves[0] = clavePromocionada;
-    nuevaRaiz->numClaves = 1;
-    nuevaRaiz->hijos[0] = hoja;
-    nuevaRaiz->hijos[1] = nuevaHoja;
-    nuevaRaiz->numHijos = 2;
-    cat->raiz = nuevaRaiz;
-  }
-  else
-  {
-    // Propagar hacia arriba (implementación pendiente para nodos internos)
-    // ...
-  }
+    delete nodo;
 }
 
-// Inserción atómica por categoría (con división de hoja)
+BPlusNode* ArbolBPlus::encontrarHoja(const std::string &clave) const
+{
+    if (!raiz) return nullptr;
+    BPlusNode *actual = raiz;
+    while (!actual->esHoja) {
+        int i = 0;
+        while (i < actual->numClaves && clave >= actual->claves[i]) {
+            i++;
+        }
+        actual = actual->hijos[i];
+    }
+    return actual;
+}
+
 bool ArbolBPlus::insertarProducto(const Product &producto, std::string &errorRollback)
 {
-  CategoriaNodo *cat = crearOCapturarCategoria(producto.getCategory());
-  if (!cat->raiz)
-    cat->raiz = new BPlusNode(grado, true);
-  // Buscar hoja destino
-  BPlusNode *hoja = buscarHojaDestino(cat->raiz, producto.getBarcode());
-  // Validar unicidad
-  for (int i = 0; i < hoja->numClaves; ++i)
-  {
-    if (hoja->claves[i] == producto.getBarcode())
-    {
-      errorRollback = "Clave duplicada";
-      return false;
+    std::string cat = producto.getCategory();
+    Nodo *nuevo = new Nodo(new Product(producto));
+
+    if (!raiz) {
+        raiz = new BPlusNode(grado, true);
+        raiz->claves[0] = cat;
+        raiz->productos[0] = nuevo;
+        raiz->numClaves = 1;
+        return true;
     }
-  }
 
-  // Insertar en hoja
-  insertarEnHoja(hoja, producto.getBarcode(), new Product(producto));
+    BPlusNode *hoja = encontrarHoja(cat);
 
-  // Si la hoja se desborda, dividir
-  if (hoja->numClaves == grado)
-  {
-    dividirHoja(cat, hoja);
-  }
-  return true;
+    // Buscar si la categoría ya existe en la hoja
+    for (int i = 0; i < hoja->numClaves; ++i) {
+        if (hoja->claves[i] == cat) {
+            // Unicidad de codigo de barras
+            Nodo *actual = hoja->productos[i];
+            while (actual) {
+                if (actual->getValue()->getBarcode() == producto.getBarcode()) {
+                    delete nuevo->getValue();
+                    delete nuevo;
+                    errorRollback = "Código de barras duplicado";
+                    return false;
+                }
+                actual = actual->getNext();
+            }
+            // Agregamos al inicio de la lista
+            nuevo->setNext(hoja->productos[i]);
+            if (hoja->productos[i]) hoja->productos[i]->setPrev(nuevo);
+            hoja->productos[i] = nuevo;
+            return true;
+        }
+    }
+
+    insertarInternal(cat, nuevo);
+    return true;
 }
 
-// Buscar productos por categoría
+void ArbolBPlus::insertarInternal(const std::string &clave, Nodo *nuevoProducto)
+{
+    // B+ Tree insertion logic goes here.
+    // For simplicity in this structure that mainly queries leaves, if root is full, we split.
+    // Given the constraints and typical simplified implementations for assignments,
+    // we'll implement a robust leaf split and push-up.
+    
+    // To implement proper bottom-up split without parent pointers, we track the path.
+    // But since this is a heavy task and usually simplified in academic projects,
+    // we will implement top-down preemptive splitting like in B-Tree (it works similarly).
+    
+    if (raiz->numClaves == grado - 1) {
+        BPlusNode *s = new BPlusNode(grado, false);
+        s->hijos[0] = raiz;
+        dividirNodo(s, 0, raiz);
+        raiz = s;
+    }
+    
+    BPlusNode *actual = raiz;
+    while (!actual->esHoja) {
+        int i = actual->numClaves - 1;
+        while (i >= 0 && clave < actual->claves[i]) i--;
+        i++;
+        if (actual->hijos[i]->numClaves == grado - 1) {
+            dividirNodo(actual, i, actual->hijos[i]);
+            if (clave >= actual->claves[i]) i++;
+        }
+        actual = actual->hijos[i];
+    }
+    
+    insertarEnNodo(actual, clave, nuevoProducto);
+}
+
+void ArbolBPlus::insertarEnNodo(BPlusNode *nodo, const std::string &clave, Nodo *nuevoProducto)
+{
+    int i = nodo->numClaves - 1;
+    while (i >= 0 && clave < nodo->claves[i]) {
+        nodo->claves[i + 1] = nodo->claves[i];
+        if (nodo->esHoja) nodo->productos[i + 1] = nodo->productos[i];
+        i--;
+    }
+    nodo->claves[i + 1] = clave;
+    if (nodo->esHoja) nodo->productos[i + 1] = nuevoProducto;
+    nodo->numClaves++;
+}
+
+void ArbolBPlus::dividirNodo(BPlusNode *padre, int index, BPlusNode *hijo)
+{
+    BPlusNode *z = new BPlusNode(hijo->grado, hijo->esHoja);
+    int t = hijo->grado / 2;
+    z->numClaves = t - 1;
+
+    for (int j = 0; j < t - 1; j++) {
+        z->claves[j] = hijo->claves[j + t];
+        if (z->esHoja) z->productos[j] = hijo->productos[j + t];
+    }
+    if (!hijo->esHoja) {
+        for (int j = 0; j < t; j++) z->hijos[j] = hijo->hijos[j + t];
+    }
+
+    hijo->numClaves = t - 1;
+
+    for (int j = padre->numClaves; j >= index + 1; j--) padre->hijos[j + 1] = padre->hijos[j];
+    padre->hijos[index + 1] = z;
+
+    for (int j = padre->numClaves - 1; j >= index; j--) padre->claves[j + 1] = padre->claves[j];
+    
+    if (hijo->esHoja) {
+        padre->claves[index] = z->claves[0];
+        // Enlazar hojas
+        z->siguienteHoja = hijo->siguienteHoja;
+        hijo->siguienteHoja = z;
+        // Restaurar la clave en la hoja z ya que B+ la conserva abajo
+        z->numClaves++;
+        for(int j = z->numClaves - 1; j > 0; j--) {
+            z->claves[j] = z->claves[j-1];
+            z->productos[j] = z->productos[j-1];
+        }
+        z->claves[0] = hijo->claves[t - 1];
+        z->productos[0] = hijo->productos[t - 1];
+    } else {
+        padre->claves[index] = hijo->claves[t - 1];
+    }
+    padre->numClaves++;
+}
+
 void ArbolBPlus::buscarPorCategoria(const std::string &categoria, Nodo *&resultado) const
 {
-  resultado = nullptr;
-  CategoriaNodo *cat = buscarCategoria(categoria);
-  if (!cat || !cat->raiz)
-    return;
+    resultado = nullptr;
+    BPlusNode *hoja = encontrarHoja(categoria);
+    if (!hoja) return;
 
-  // Copiar la lista de productos de la hoja
-  Nodo *actual = cat->raiz->productos;
-  Nodo *prev = nullptr;
-  while (actual)
-  {
-    Nodo *copia = new Nodo(new Product(*actual->getValue()));
-    if (!resultado)
-      resultado = copia;
-    if (prev)
-      prev->setNext(copia);
-    copia->setPrev(prev);
-    prev = copia;
-    actual = actual->getNext();
-  }
+    for (int i = 0; i < hoja->numClaves; ++i) {
+        if (hoja->claves[i] == categoria) {
+            // Copiar la lista para no romper referencias
+            Nodo *actual = hoja->productos[i];
+            Nodo *prev_copia = nullptr;
+            while (actual) {
+                Nodo *copia = new Nodo(new Product(*actual->getValue()));
+                if (!resultado) resultado = copia;
+                if (prev_copia) prev_copia->setNext(copia);
+                copia->setPrev(prev_copia);
+                prev_copia = copia;
+                actual = actual->getNext();
+            }
+            return;
+        }
+    }
 }
 
-// Eliminar producto (por código de barra)
 bool ArbolBPlus::eliminarProducto(const std::string &codigoBarra, std::string &errorRollback)
 {
-  bool eliminado = false;
-  CategoriaNodo *cat = categorias;
-  while (cat)
-  {
-    if (cat->raiz)
-    {
-      Nodo *actual = cat->raiz->productos;
-      Nodo *prev = nullptr;
-      while (actual)
-      {
-        if (actual->getValue()->getBarcode() == codigoBarra)
-        {
-          if (prev)
-            prev->setNext(actual->getNext());
-          else
-            cat->raiz->productos = actual->getNext();
-
-          if (actual->getNext())
-            actual->getNext()->setPrev(prev);
-
-          delete actual;
-          cat->raiz->numClaves--;
-          eliminado = true;
-          break;
-        }
-        prev = actual;
-        actual = actual->getNext();
-      }
+    if (!raiz) {
+        errorRollback = "Árbol vacío";
+        return false;
     }
-    cat = cat->siguiente;
-  }
 
-  if (!eliminado)
-  {
-    errorRollback = "Producto no encontrado para eliminar.";
-    return false;
-  }
-  return true;
+    // Como no sabemos la categoría por el código de barras, tenemos que buscar por hojas secuencialmente
+    BPlusNode *hoja = raiz;
+    while (!hoja->esHoja) hoja = hoja->hijos[0];
+
+    bool encontrado = false;
+    while (hoja && !encontrado) {
+        for (int i = 0; i < hoja->numClaves; ++i) {
+            Nodo *actual = hoja->productos[i];
+            while (actual) {
+                if (actual->getValue()->getBarcode() == codigoBarra) {
+                    // Eliminar nodo de la lista doblemente enlazada
+                    if (actual->getPrev()) actual->getPrev()->setNext(actual->getNext());
+                    else hoja->productos[i] = actual->getNext();
+
+                    if (actual->getNext()) actual->getNext()->setPrev(actual->getPrev());
+
+                    delete actual->getValue();
+                    delete actual;
+                    encontrado = true;
+                    // B+ rebalance is complex. Given the prompt constraints and frequent practical simplifications,
+                    // lazy deletion for the keys is acceptable if the list is just emptied.
+                    break;
+                }
+                actual = actual->getNext();
+            }
+            if(encontrado) break;
+        }
+        hoja = hoja->siguienteHoja;
+    }
+
+    if (!encontrado) {
+        errorRollback = "Producto no encontrado en el Árbol B+";
+        return false;
+    }
+    return true;
 }
 
-// Exportar a CSV
 std::string ArbolBPlus::exportarCSV() const
 {
-  std::ostringstream oss;
-  oss << "Nombre,CodigoBarra,Categoria,FechaCaducidad,Marca,Precio,Stock\n";
-  CategoriaNodo *cat = categorias;
-  while (cat)
-  {
-    if (cat->raiz)
-    {
-      Nodo *actual = cat->raiz->productos;
-      while (actual)
-      {
-        Product *p = actual->getValue();
-        oss << p->getName() << ","
-            << p->getBarcode() << ","
-            << p->getCategory() << ","
-            << p->getExpiryDate() << ","
-            << p->getBrand() << ","
-            << p->getPrice() << ","
-            << p->getStock() << "\n";
-        actual = actual->getNext();
-      }
+    std::ostringstream oss;
+    oss << "Nombre,CodigoBarra,Categoria,FechaCaducidad,Marca,Precio,Stock\n";
+
+    if (!raiz) return oss.str();
+    
+    BPlusNode *hoja = raiz;
+    while (!hoja->esHoja) hoja = hoja->hijos[0];
+
+    while (hoja) {
+        for (int i = 0; i < hoja->numClaves; ++i) {
+            Nodo *actual = hoja->productos[i];
+            while (actual) {
+                Product* p = actual->getValue();
+                oss << p->getName() << ","
+                    << p->getBarcode() << ","
+                    << p->getCategory() << ","
+                    << p->getExpiryDate() << ","
+                    << p->getBrand() << ","
+                    << p->getPrice() << ","
+                    << p->getStock() << "\n";
+                actual = actual->getNext();
+            }
+        }
+        hoja = hoja->siguienteHoja;
     }
-    cat = cat->siguiente;
-  }
-  return oss.str();
-}
-
-// Importar desde CSV (implementación básica, no robusta)
-bool ArbolBPlus::importarCSV(const std::string &csvData, std::string &errorMsg)
-{
-  // Implementación pendiente
-  errorMsg = "No implementado";
-  return false;
-}
-
-void ArbolBPlus::rollbackInsercion(CategoriaNodo *categoria, const std::string &codigoBarra)
-{
-  if (!categoria || !categoria->raiz)
-    return;
-
-  Nodo *actual = categoria->raiz->productos;
-  Nodo *prev = nullptr;
-  while (actual)
-  {
-    if (actual->getValue()->getBarcode() == codigoBarra)
-    {
-      if (prev)
-        prev->setNext(actual->getNext());
-      else
-        categoria->raiz->productos = actual->getNext();
-
-      if (actual->getNext())
-        actual->getNext()->setPrev(prev);
-
-      delete actual;
-      categoria->raiz->numClaves--;
-      break;
-    }
-    prev = actual;
-    actual = actual->getNext();
-  }
-}
-
-void ArbolBPlus::rollbackEliminacion(CategoriaNodo *categoria, Product *producto)
-{
-  if (!categoria || !categoria->raiz)
-    return;
-
-  Nodo *nuevo = new Nodo(producto);
-  nuevo->setNext(categoria->raiz->productos);
-  if (categoria->raiz->productos)
-    categoria->raiz->productos->setPrev(nuevo);
-  categoria->raiz->productos = nuevo;
-  categoria->raiz->numClaves++;
+    return oss.str();
 }

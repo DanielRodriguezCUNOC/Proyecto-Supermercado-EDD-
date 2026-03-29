@@ -2,73 +2,45 @@
 #define ARBOLBPLUS_H
 
 #include <string>
-#include "model/entidades/product.h"
-#include "model/entidades/nodo.h"
+#include "../entidades/product.h"
+#include "../entidades/nodo.h"
 
-// Nodo para lista enlazada de categorías
-struct CategoriaNodo
+// Nodo del Árbol B+
+class BPlusNode
 {
-    std::string nombre;
-    struct BPlusNode *raiz;
-    CategoriaNodo *siguiente;
-    CategoriaNodo(const std::string &n) : nombre(n), raiz(nullptr), siguiente(nullptr) {}
-};
-
-// Nodo del árbol B+
-struct BPlusNode
-{
+public:
     bool esHoja;
-    // arreglo dinámico de claves
-    std::string *claves;
+    int grado;
     int numClaves;
-    // arreglo dinámico de hijos
-    BPlusNode **hijos;
-    int numHijos;
-    // solo en hojas: lista doblemente enlazada de productos
-    Nodo *productos;
-    // para recorrido por hojas
-    BPlusNode *siguienteHoja;
+    std::string *claves;       // Categorías
+    BPlusNode **hijos;         // Hijos (solo internos)
+    Nodo **productos;          // Cabezas de lista de productos por categoría (solo hojas)
+    BPlusNode *siguienteHoja;  // Puntero para recorrido secuencial
 
-    BPlusNode(int grado, bool hoja);
+    BPlusNode(int _grado, bool _hoja);
     ~BPlusNode();
 };
 
 class ArbolBPlus
 {
 public:
-    ArbolBPlus(int grado = 4);
+    BPlusNode *raiz;
+    int grado;
+
+    ArbolBPlus(int _grado = 4);
     ~ArbolBPlus();
 
-    // Inserción atómica por categoría
     bool insertarProducto(const Product &producto, std::string &errorRollback);
-
-    // Buscar productos por categoría
     void buscarPorCategoria(const std::string &categoria, Nodo *&resultado) const;
-
-    // Eliminar producto (por código de barra)
     bool eliminarProducto(const std::string &codigoBarra, std::string &errorRollback);
-
-    // Exportar a CSV
     std::string exportarCSV() const;
 
-    // Importar desde CSV
-    bool importarCSV(const std::string &csvData, std::string &errorMsg);
-
 private:
-    int grado;
-    CategoriaNodo *categorias;
-
-    // Métodos para lógica interna
-    CategoriaNodo *buscarCategoria(const std::string &nombre) const;
-    CategoriaNodo *crearOCapturarCategoria(const std::string &nombre);
-    void liberarCategorias();
-    void rollbackInsercion(CategoriaNodo *categoria, const std::string &codigoBarra);
-    void rollbackEliminacion(CategoriaNodo *categoria, Product *producto);
-
-    // Métodos para inserción y rebalanceo
-    BPlusNode *buscarHojaDestino(BPlusNode *raiz, const std::string &clave);
-    void insertarEnHoja(BPlusNode *hoja, const std::string &clave, Product *producto);
-    void dividirHoja(CategoriaNodo *cat, BPlusNode *hoja);
+    void destruirRec(BPlusNode *nodo);
+    void insertarEnNodo(BPlusNode *nodo, const std::string &clave, Nodo *nuevoProducto);
+    void dividirNodo(BPlusNode *padre, int index, BPlusNode *hijo);
+    void insertarInternal(const std::string &clave, Nodo *nuevoProducto);
+    BPlusNode* encontrarHoja(const std::string &clave) const;
 };
 
 #endif // ARBOLBPLUS_H

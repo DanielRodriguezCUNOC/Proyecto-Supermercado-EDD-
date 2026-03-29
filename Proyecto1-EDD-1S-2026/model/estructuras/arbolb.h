@@ -1,46 +1,97 @@
 #ifndef ARBOLB_H
 #define ARBOLB_H
 
-#include <vector>
-#include <iostream>
+#include <string>
 
-template <typename T>
+// Forward declaration of Product to be used in generic or specific context.
+class Product;
+
+// Nodo del Árbol B específico para Product (fechas de caducidad)
 class NodoB
 {
 public:
-    std::vector<T> claves;
-    std::vector<NodoB<T> *> hijos;
-    bool hoja;
-    // Grado mínimo
-    int t;
+    Product* claves; // Arreglo dinámico de claves (productos)
+    NodoB** hijos;   // Arreglo dinámico de punteros a hijos
+    int n;           // Número actual de claves
+    bool hoja;       // Verdadero si es hoja
+    int t;           // Grado mínimo
 
-    NodoB(int _t, bool _hoja) : t(_t), hoja(_hoja) {}
+    NodoB(int _t, bool _hoja);
+    ~NodoB();
+
+    void insertarNoLleno(const Product &k);
+    void dividirHijo(int i, NodoB *y);
+    void recorrer();
+
+    // Métodos para eliminación
+    int buscarClave(const std::string &codigo);
+    void eliminar(const std::string &codigo);
+    void removerDeHoja(int idx);
+    void removerDeNoHoja(int idx);
+    Product obtenerPredecesor(int idx);
+    Product obtenerSucesor(int idx);
+    void llenar(int idx);
+    void pedirPrestadoAnterior(int idx);
+    void pedirPrestadoSiguiente(int idx);
+    void fusionar(int idx);
+
+    // Para la búsqueda recursiva
+    void buscarPorCaducidadRec(const std::string &desde, const std::string &hasta, class ListaResultados* resultados);
 };
 
-template <typename T>
+// Estructura simple para almacenar resultados de búsqueda sin usar vector
+class NodoResultadoList {
+public:
+    Product producto;
+    NodoResultadoList* next;
+    NodoResultadoList(const Product& p) : producto(p), next(nullptr) {}
+};
+
+class ListaResultados {
+public:
+    NodoResultadoList* cabeza;
+    NodoResultadoList* cola;
+    int size;
+
+    ListaResultados() : cabeza(nullptr), cola(nullptr), size(0) {}
+    ~ListaResultados() {
+        NodoResultadoList* actual = cabeza;
+        while(actual) {
+            NodoResultadoList* aux = actual->next;
+            delete actual;
+            actual = aux;
+        }
+    }
+    void agregar(const Product& p) {
+        NodoResultadoList* n = new NodoResultadoList(p);
+        if(!cabeza) cabeza = cola = n;
+        else {
+            cola->next = n;
+            cola = n;
+        }
+        size++;
+    }
+};
+
 class ArbolB
 {
 public:
-    NodoB<T> *raiz;
+    NodoB *raiz;
     int t;
 
     ArbolB(int _t);
-    void insertar(const T &k);
+    ~ArbolB();
+
+    void insertar(const Product &k);
     void imprimir();
+    
+    // Retorna una lista con los productos que cumplen el rango de caducidad
+    ListaResultados* buscarPorCaducidad(const std::string &desde, const std::string &hasta);
 
-    // Buscar productos por rango de caducidad (solo para T=Product)
-    std::vector<T> buscarPorCaducidad(const std::string &desde, const std::string &hasta);
-
-    // Eliminar producto por código de barra (solo para T=Product)
     void eliminarPorCodigo(const std::string &codigo);
 
 private:
-    void insertarNoLleno(NodoB<T> *nodo, const T &k);
-    void dividirHijo(NodoB<T> *padre, int i, NodoB<T> *hijo);
-    void imprimirRec(NodoB<T> *nodo, int nivel);
-    void buscarPorCaducidadRec(NodoB<T> *nodo, const std::string &desde, const std::string &hasta, std::vector<T> &resultado);
-    void eliminarRec(NodoB<T> *nodo, const std::string &codigo);
-    int encontrarClave(NodoB<T> *nodo, const std::string &codigo);
+    void destruirRec(NodoB* nodo);
 };
 
 #endif // ARBOLB_H

@@ -1,189 +1,296 @@
 #include "arbolb.h"
+#include "../entidades/product.h"
 #include <iostream>
 using namespace std;
 
-// Constructor
-template <typename T>
-ArbolB<T>::ArbolB(int _t)
+NodoB::NodoB(int _t, bool _hoja) : t(_t), hoja(_hoja), n(0)
 {
-  raiz = nullptr;
-  t = _t;
+    claves = new Product[2 * t - 1];
+    hijos = new NodoB *[2 * t];
+    for (int i = 0; i < 2 * t; i++) hijos[i] = nullptr;
 }
 
-// Insertar clave
-template <typename T>
-void ArbolB<T>::insertar(const T &k)
+NodoB::~NodoB()
 {
-  if (!raiz)
-  {
-    raiz = new NodoB<T>(t, true);
-    raiz->claves.push_back(k);
-  }
-  else
-  {
-    if ((int)raiz->claves.size() == 2 * t - 1)
-    {
-      NodoB<T> *s = new NodoB<T>(t, false);
-      s->hijos.push_back(raiz);
-      dividirHijo(s, 0, raiz);
-      int i = 0;
-      if (s->claves[0] < k)
-        i++;
-      insertarNoLleno(s->hijos[i], k);
-      raiz = s;
-    }
-    else
-    {
-      insertarNoLleno(raiz, k);
-    }
-  }
+    delete[] claves;
+    delete[] hijos;
 }
 
-// Insertar en nodo no lleno
-template <typename T>
-void ArbolB<T>::insertarNoLleno(NodoB<T> *nodo, const T &k)
+void NodoB::recorrer()
 {
-  int i = nodo->claves.size() - 1;
-  if (nodo->hoja)
-  {
-    nodo->claves.push_back(k);
-    int j = nodo->claves.size() - 1;
-    while (j > 0 && nodo->claves[j] < nodo->claves[j - 1])
+    int i;
+    for (i = 0; i < n; i++)
     {
-      std::swap(nodo->claves[j], nodo->claves[j - 1]);
-      j--;
+        if (!hoja) hijos[i]->recorrer();
+        cout << claves[i].getBarcode() << " (" << claves[i].getExpiryDate() << ") ";
     }
-  }
-  else
-  {
-    while (i >= 0 && k < nodo->claves[i])
-      i--;
-    i++;
-    if ((int)nodo->hijos[i]->claves.size() == 2 * t - 1)
-    {
-      dividirHijo(nodo, i, nodo->hijos[i]);
-      if (k > nodo->claves[i])
-        i++;
-    }
-    insertarNoLleno(nodo->hijos[i], k);
-  }
+    if (!hoja) hijos[i]->recorrer();
 }
 
-// Dividir hijo
-template <typename T>
-void ArbolB<T>::dividirHijo(NodoB<T> *padre, int i, NodoB<T> *hijo)
+int NodoB::buscarClave(const std::string &codigo)
 {
-  NodoB<T> *z = new NodoB<T>(t, hijo->hoja);
-  for (int j = 0; j < t - 1; j++)
-
-    // Buscar productos por rango de caducidad (solo para T=Product)
-    template <typename T>
-    std::vector<T> ArbolB<T>::buscarPorCaducidad(const std::string &desde, const std::string &hasta)
-    {
-      std::vector<T> resultado;
-      buscarPorCaducidadRec(raiz, desde, hasta, resultado);
-      return resultado;
-    }
-
-  template <typename T>
-  void ArbolB<T>::buscarPorCaducidadRec(NodoB<T> * nodo, const std::string &desde, const std::string &hasta, std::vector<T> &resultado)
-  {
-    if (!nodo)
-      return;
-    for (size_t i = 0; i < nodo->claves.size(); ++i)
-    {
-
-      // Usar método miembro del producto
-      if (nodo->claves[i].estaEnRangoCaducidad(desde, hasta))
-      {
-        resultado.push_back(nodo->claves[i]);
-      }
-      if (!nodo->hoja && i < nodo->hijos.size())
-      {
-        buscarPorCaducidadRec(nodo->hijos[i], desde, hasta, resultado);
-      }
-    }
-    if (!nodo->hoja && nodo->hijos.size() > nodo->claves.size())
-    {
-      buscarPorCaducidadRec(nodo->hijos.back(), desde, hasta, resultado);
-    }
-  }
-
-  // Eliminar producto por código de barra (solo para T=Product)
-  template <typename T>
-  void ArbolB<T>::eliminarPorCodigo(const std::string &codigo)
-  {
-    eliminarRec(raiz, codigo);
-    // TODO: rebalanceo y manejo de nodos vacíos
-  }
-
-  template <typename T>
-  void ArbolB<T>::eliminarRec(NodoB<T> * nodo, const std::string &codigo)
-  {
-    if (!nodo)
-      return;
-    int idx = encontrarClave(nodo, codigo);
-
-    // Si la clave está en este nodo
-    if (idx < (int)nodo->claves.size() && nodo->claves[idx].getBarcode() == codigo)
-    {
-      // Si es hoja, eliminar directamente
-      if (nodo->hoja)
-      {
-        nodo->claves.erase(nodo->claves.begin() + idx);
-      }
-      else
-      {
-        // TODO: manejar eliminación en nodos internos (rebalanceo, merges, etc.)
-      }
-    }
-    else
-    {
-      // Si no es hoja, buscar en el hijo adecuado
-      if (nodo->hoja)
-        return; // No encontrado
-      eliminarRec(nodo->hijos[idx], codigo);
-    }
-  }
-
-  template <typename T>
-  int ArbolB<T>::encontrarClave(NodoB<T> * nodo, const std::string &codigo)
-  {
     int idx = 0;
-    while (idx < (int)nodo->claves.size() && nodo->claves[idx].getBarcode() < codigo)
-    {
-      idx++;
-    }
+    while (idx < n && claves[idx].getBarcode() < codigo)
+        ++idx;
     return idx;
-  }
-  z->claves.push_back(hijo->claves[j + t]);
-  if (!hijo->hoja)
-  {
-    for (int j = 0; j < t; j++)
-      z->hijos.push_back(hijo->hijos[j + t]);
-  }
-  hijo->claves.resize(t - 1);
-  hijo->hijos.resize(hijo->hoja ? 0 : t);
-  padre->hijos.insert(padre->hijos.begin() + i + 1, z);
-  padre->claves.insert(padre->claves.begin() + i, hijo->claves[t - 1]);
 }
 
-// Imprimir árbol
-template <typename T>
-void ArbolB<T>::imprimir()
+void NodoB::eliminar(const std::string &codigo)
 {
-  imprimirRec(raiz, 0);
+    int idx = buscarClave(codigo);
+
+    if (idx < n && claves[idx].getBarcode() == codigo) {
+        if (hoja) removerDeHoja(idx);
+        else removerDeNoHoja(idx);
+    } else {
+        if (hoja) {
+            // No encontrado en el árbol
+            return;
+        }
+        bool flag = (idx == n);
+        if (hijos[idx]->n < t) llenar(idx);
+        if (flag && idx > n) hijos[idx - 1]->eliminar(codigo);
+        else hijos[idx]->eliminar(codigo);
+    }
 }
 
-template <typename T>
-void ArbolB<T>::imprimirRec(NodoB<T> *nodo, int nivel)
+void NodoB::removerDeHoja(int idx)
 {
-  if (!nodo)
-    return;
-  cout << string(nivel * 2, ' ');
-  for (const auto &clave : nodo->claves)
-    cout << clave << " ";
-  cout << endl;
-  for (auto hijo : nodo->hijos)
-    imprimirRec(hijo, nivel + 1);
+    for (int i = idx + 1; i < n; ++i)
+        claves[i - 1] = claves[i];
+    n--;
+}
+
+void NodoB::removerDeNoHoja(int idx)
+{
+    Product k = claves[idx];
+    if (hijos[idx]->n >= t) {
+        Product pred = obtenerPredecesor(idx);
+        claves[idx] = pred;
+        hijos[idx]->eliminar(pred.getBarcode());
+    } else if (hijos[idx + 1]->n >= t) {
+        Product suc = obtenerSucesor(idx);
+        claves[idx] = suc;
+        hijos[idx + 1]->eliminar(suc.getBarcode());
+    } else {
+        fusionar(idx);
+        hijos[idx]->eliminar(k.getBarcode());
+    }
+}
+
+Product NodoB::obtenerPredecesor(int idx)
+{
+    NodoB* cur = hijos[idx];
+    while (!cur->hoja) cur = cur->hijos[cur->n];
+    return cur->claves[cur->n - 1];
+}
+
+Product NodoB::obtenerSucesor(int idx)
+{
+    NodoB* cur = hijos[idx + 1];
+    while (!cur->hoja) cur = cur->hijos[0];
+    return cur->claves[0];
+}
+
+void NodoB::llenar(int idx)
+{
+    if (idx != 0 && hijos[idx - 1]->n >= t) pedirPrestadoAnterior(idx);
+    else if (idx != n && hijos[idx + 1]->n >= t) pedirPrestadoSiguiente(idx);
+    else {
+        if (idx != n) fusionar(idx);
+        else fusionar(idx - 1);
+    }
+}
+
+void NodoB::pedirPrestadoAnterior(int idx)
+{
+    NodoB* hijo = hijos[idx];
+    NodoB* hermano = hijos[idx - 1];
+
+    for (int i = hijo->n - 1; i >= 0; --i) hijo->claves[i + 1] = hijo->claves[i];
+    if (!hijo->hoja) {
+        for (int i = hijo->n; i >= 0; --i) hijo->hijos[i + 1] = hijo->hijos[i];
+    }
+    hijo->claves[0] = claves[idx - 1];
+    if (!hijo->hoja) hijo->hijos[0] = hermano->hijos[hermano->n];
+    claves[idx - 1] = hermano->claves[hermano->n - 1];
+    hijo->n += 1;
+    hermano->n -= 1;
+}
+
+void NodoB::pedirPrestadoSiguiente(int idx)
+{
+    NodoB* hijo = hijos[idx];
+    NodoB* hermano = hijos[idx + 1];
+
+    hijo->claves[hijo->n] = claves[idx];
+    if (!hijo->hoja) hijo->hijos[hijo->n + 1] = hermano->hijos[0];
+    claves[idx] = hermano->claves[0];
+    for (int i = 1; i < hermano->n; ++i) hermano->claves[i - 1] = hermano->claves[i];
+    if (!hermano->hoja) {
+        for (int i = 1; i <= hermano->n; ++i) hermano->hijos[i - 1] = hermano->hijos[i];
+    }
+    hijo->n += 1;
+    hermano->n -= 1;
+}
+
+void NodoB::fusionar(int idx)
+{
+    NodoB* hijo = hijos[idx];
+    NodoB* hermano = hijos[idx + 1];
+
+    hijo->claves[t - 1] = claves[idx];
+    for (int i = 0; i < hermano->n; ++i) hijo->claves[i + t] = hermano->claves[i];
+    if (!hijo->hoja) {
+        for (int i = 0; i <= hermano->n; ++i) hijo->hijos[i + t] = hermano->hijos[i];
+    }
+    for (int i = idx + 1; i < n; ++i) claves[i - 1] = claves[i];
+    for (int i = idx + 2; i <= n; ++i) hijos[i - 1] = hijos[i];
+    hijo->n += hermano->n + 1;
+    n--;
+    delete hermano;
+}
+
+void NodoB::insertarNoLleno(const Product &k)
+{
+    int i = n - 1;
+    if (hoja) {
+        // Ordenamos por fecha de caducidad. Si son iguales, por código de barras.
+        while (i >= 0 && (claves[i].getExpiryDate() > k.getExpiryDate() || 
+              (claves[i].getExpiryDate() == k.getExpiryDate() && claves[i].getBarcode() > k.getBarcode())))
+        {
+            claves[i + 1] = claves[i];
+            i--;
+        }
+        claves[i + 1] = k;
+        n++;
+    } else {
+        while (i >= 0 && (claves[i].getExpiryDate() > k.getExpiryDate() || 
+              (claves[i].getExpiryDate() == k.getExpiryDate() && claves[i].getBarcode() > k.getBarcode())))
+        {
+            i--;
+        }
+        i++;
+        if (hijos[i]->n == 2 * t - 1) {
+            dividirHijo(i, hijos[i]);
+            if (claves[i].getExpiryDate() < k.getExpiryDate() ||
+                (claves[i].getExpiryDate() == k.getExpiryDate() && claves[i].getBarcode() < k.getBarcode()))
+                i++;
+        }
+        hijos[i]->insertarNoLleno(k);
+    }
+}
+
+void NodoB::dividirHijo(int i, NodoB *y)
+{
+    NodoB *z = new NodoB(y->t, y->hoja);
+    z->n = t - 1;
+
+    for (int j = 0; j < t - 1; j++) z->claves[j] = y->claves[j + t];
+    if (!y->hoja) {
+        for (int j = 0; j < t; j++) z->hijos[j] = y->hijos[j + t];
+    }
+    y->n = t - 1;
+
+    for (int j = n; j >= i + 1; j--) hijos[j + 1] = hijos[j];
+    hijos[i + 1] = z;
+
+    for (int j = n - 1; j >= i; j--) claves[j + 1] = claves[j];
+    claves[i] = y->claves[t - 1];
+    n++;
+}
+
+void NodoB::buscarPorCaducidadRec(const std::string &desde, const std::string &hasta, ListaResultados* resultados)
+{
+    int i = 0;
+    while (i < n && claves[i].getExpiryDate() < desde)
+        i++;
+        
+    for (; i < n && claves[i].getExpiryDate() <= hasta; i++) {
+        if (!hoja) hijos[i]->buscarPorCaducidadRec(desde, hasta, resultados);
+        resultados->agregar(claves[i]);
+    }
+    if (!hoja) {
+        hijos[i]->buscarPorCaducidadRec(desde, hasta, resultados);
+    }
+}
+
+// --------------------------------------------------------------------------
+// ArbolB
+// --------------------------------------------------------------------------
+
+ArbolB::ArbolB(int _t)
+{
+    raiz = nullptr;
+    t = _t;
+}
+
+void ArbolB::destruirRec(NodoB* nodo)
+{
+    if (nodo) {
+        if (!nodo->hoja) {
+            for (int i = 0; i <= nodo->n; i++) {
+                destruirRec(nodo->hijos[i]);
+            }
+        }
+        delete nodo;
+    }
+}
+
+ArbolB::~ArbolB()
+{
+    destruirRec(raiz);
+}
+
+void ArbolB::insertar(const Product &k)
+{
+    if (!raiz) {
+        raiz = new NodoB(t, true);
+        raiz->claves[0] = k;
+        raiz->n = 1;
+    } else {
+        if (raiz->n == 2 * t - 1) {
+            NodoB *s = new NodoB(t, false);
+            s->hijos[0] = raiz;
+            s->dividirHijo(0, raiz);
+            int i = 0;
+            if (s->claves[0].getExpiryDate() < k.getExpiryDate() ||
+               (s->claves[0].getExpiryDate() == k.getExpiryDate() && s->claves[0].getBarcode() < k.getBarcode()))
+                i++;
+            s->hijos[i]->insertarNoLleno(k);
+            raiz = s;
+        } else {
+            raiz->insertarNoLleno(k);
+        }
+    }
+}
+
+void ArbolB::eliminarPorCodigo(const std::string &codigo)
+{
+    if (!raiz) return;
+    raiz->eliminar(codigo);
+    if (raiz->n == 0) {
+        NodoB *tmp = raiz;
+        if (raiz->hoja) raiz = nullptr;
+        else raiz = raiz->hijos[0];
+        // Note: intentionally avoid deleting tmp's children when deleting root
+        delete[] tmp->claves;
+        delete[] tmp->hijos;
+        ::operator delete(tmp); // Free without calling destructor again directly if needed, wait, let's just make sure destruction doesn't double-free
+    }
+}
+
+void ArbolB::imprimir()
+{
+    if (raiz) raiz->recorrer();
+    cout << endl;
+}
+
+ListaResultados* ArbolB::buscarPorCaducidad(const std::string &desde, const std::string &hasta)
+{
+    ListaResultados* resultados = new ListaResultados();
+    if (raiz) {
+        raiz->buscarPorCaducidadRec(desde, hasta, resultados);
+    }
+    return resultados;
 }

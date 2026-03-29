@@ -13,6 +13,7 @@ void ListaEnlazadaNoOrdenada::insertar(Product *product)
   else
   {
     nuevoProducto->setNext(this->cabeza);
+    this->cabeza->setPrev(nuevoProducto);
     this->cabeza = nuevoProducto;
   }
   size++;
@@ -24,7 +25,6 @@ void ListaEnlazadaNoOrdenada::eliminar(Product *product)
     return;
 
   Nodo *actual = this->cabeza;
-  Nodo *anterior = nullptr;
 
   while (actual != nullptr)
   {
@@ -33,24 +33,24 @@ void ListaEnlazadaNoOrdenada::eliminar(Product *product)
       if (actual == this->cabeza)
       {
         this->cabeza = actual->getNext();
-        if (actual == this->cola)
-        {
-          this->cola = nullptr;
-        }
+        if (this->cabeza != nullptr) this->cabeza->setPrev(nullptr);
+        else this->cola = nullptr;
+      }
+      else if (actual == this->cola)
+      {
+        this->cola = actual->getPrev();
+        if (this->cola != nullptr) this->cola->setNext(nullptr);
+        else this->cabeza = nullptr;
       }
       else
       {
-        anterior->setNext(actual->getNext());
-        if (actual == this->cola)
-        {
-          this->cola = anterior;
-        }
+        actual->getPrev()->setNext(actual->getNext());
+        actual->getNext()->setPrev(actual->getPrev());
       }
       delete actual;
       size--;
       return;
     }
-    anterior = actual;
     actual = actual->getNext();
   }
 }
