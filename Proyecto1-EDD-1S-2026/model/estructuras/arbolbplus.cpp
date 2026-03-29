@@ -103,15 +103,6 @@ bool ArbolBPlus::insertarProducto(const Product &producto, std::string &errorRol
 
 void ArbolBPlus::insertarInternal(const std::string &clave, Nodo *nuevoProducto)
 {
-    // B+ Tree insertion logic goes here.
-    // For simplicity in this structure that mainly queries leaves, if root is full, we split.
-    // Given the constraints and typical simplified implementations for assignments,
-    // we'll implement a robust leaf split and push-up.
-    
-    // To implement proper bottom-up split without parent pointers, we track the path.
-    // But since this is a heavy task and usually simplified in academic projects,
-    // we will implement top-down preemptive splitting like in B-Tree (it works similarly).
-    
     if (raiz->numClaves == grado - 1) {
         BPlusNode *s = new BPlusNode(grado, false);
         s->hijos[0] = raiz;

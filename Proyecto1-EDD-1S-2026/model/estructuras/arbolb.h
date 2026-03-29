@@ -3,7 +3,6 @@
 
 #include <string>
 
-// Forward declaration of Product to be used in generic or specific context.
 class Product;
 
 // Nodo del Árbol B específico para Product (fechas de caducidad)

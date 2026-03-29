@@ -124,17 +124,12 @@ NodoAVL* ArbolAVL::nodoValorMinimo(NodoAVL* nodo) {
     return actual;
 }
 
+//Elimina un producto del árbol
 void ArbolAVL::eliminar(const std::string& barcode) {
-    // Nota: Como la clave principal es nombre pero necesitamos borrar por código de barra,
-    // podríamos necesitar un borrado adaptado si se desea código $O(\log n)$, 
-    // pero en este caso el barcode requiere buscar. Como no sabemos el nombre, 
-    // asumiremos una búsqueda general si se envía un código (aunque idealmente la app lo mande con el producto completo)
-    // Para adaptarlo a lo básico:
-    raiz = eliminarRec(raiz, barcode); // Borrado simple por código, necesita recorrido adaptado si es árbol ordenado por nombre
-    // OJO: Este borrado por "código de barras" que propongo busca el código en todo el árbol 
-    // ya que el árbol AVL está balanceado por NOMBRE.
+    raiz = eliminarRec(raiz, barcode); 
 }
 
+//Elimina un producto del árbol recursivamente
 NodoAVL* ArbolAVL::eliminarRec(NodoAVL* root, const std::string& barcode) {
     if (root == nullptr)
         return root;
@@ -159,7 +154,7 @@ NodoAVL* ArbolAVL::eliminarRec(NodoAVL* root, const std::string& barcode) {
                 temp = root;
                 root = nullptr;
             } else {
-                *root = *temp; // copio contenido 
+                *root = *temp; // copiar contenido 
             }
             delete temp;
         } else {

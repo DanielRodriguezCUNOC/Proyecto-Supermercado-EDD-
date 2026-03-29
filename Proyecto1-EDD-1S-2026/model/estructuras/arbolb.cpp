@@ -273,10 +273,9 @@ void ArbolB::eliminarPorCodigo(const std::string &codigo)
         NodoB *tmp = raiz;
         if (raiz->hoja) raiz = nullptr;
         else raiz = raiz->hijos[0];
-        // Note: intentionally avoid deleting tmp's children when deleting root
         delete[] tmp->claves;
         delete[] tmp->hijos;
-        ::operator delete(tmp); // Free without calling destructor again directly if needed, wait, let's just make sure destruction doesn't double-free
+        ::operator delete(tmp); 
     }
 }
 
