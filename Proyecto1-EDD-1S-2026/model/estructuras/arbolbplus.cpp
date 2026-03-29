@@ -72,21 +72,144 @@ void ArbolBPlus::liberarCategorias()
 }
 
 // Inserción atómica por categoría
+
+// --- MÉTODOS AUXILIARES PARA INSERCIÓN Y REBALANCEO ---
+BPlusNode *ArbolBPlus::buscarHojaDestino(BPlusNode *raiz, const std::string &clave)
+{
+  BPlusNode *actual = raiz;
+  while (actual && !actual->esHoja)
+  {
+    int i = 0;
+    while (i < actual->numClaves && clave >= actual->claves[i])
+      i++;
+    actual = actual->hijos[i];
+  }
+  return actual;
+}
+
+void ArbolBPlus::insertarEnHoja(BPlusNode *hoja, const std::string &clave, Product *producto)
+{
+  int i = hoja->numClaves - 1;
+  while (i >= 0 && clave < hoja->claves[i])
+  {
+    hoja->claves[i + 1] = hoja->claves[i];
+    i--;
+  }
+  hoja->claves[i + 1] = clave;
+  hoja->numClaves++;
+  // Insertar producto en la lista enlazada en orden
+  Nodo *nuevo = new Nodo(producto);
+  Nodo *actual = hoja->productos;
+  Nodo *prev = nullptr;
+  while (actual && actual->getValue()->getBarcode() < clave)
+  {
+    prev = actual;
+    actual = actual->getNext();
+  }
+  nuevo->setNext(actual);
+  if (actual)
+    actual->setPrev(nuevo);
+  nuevo->setPrev(prev);
+  if (prev)
+    prev->setNext(nuevo);
+  else
+    hoja->productos = nuevo;
+}
+
+void ArbolBPlus::dividirHoja(CategoriaNodo *cat, BPlusNode *hoja)
+{
+  int mitad = grado / 2;
+  BPlusNode *nuevaHoja = new BPlusNode(grado, true);
+  // Copiar la mitad superior de claves a la nueva hoja
+  for (int i = mitad, j = 0; i < grado; ++i, ++j)
+  {
+    nuevaHoja->claves[j] = hoja->claves[i];
+    nuevaHoja->numClaves++;
+  }
+  hoja->numClaves = mitad;
+  // Copiar productos correspondientes
+  Nodo *actual = hoja->productos;
+  Nodo *prev = nullptr;
+  int idx = 0;
+  while (actual)
+  {
+    Nodo *sig = actual->getNext();
+    if (idx >= mitad)
+    {
+      // Mover a nueva hoja
+      if (!nuevaHoja->productos)
+      {
+        nuevaHoja->productos = actual;
+        actual->setPrev(nullptr);
+      }
+      else
+      {
+        Nodo *ult = nuevaHoja->productos;
+        while (ult->getNext())
+          ult = ult->getNext();
+        ult->setNext(actual);
+        actual->setPrev(ult);
+      }
+      actual->setNext(nullptr);
+    }
+    else
+    {
+      prev = actual;
+    }
+    actual = sig;
+    idx++;
+  }
+  if (prev)
+    prev->setNext(nullptr);
+  // Enlazar hojas
+  nuevaHoja->siguienteHoja = hoja->siguienteHoja;
+  hoja->siguienteHoja = nuevaHoja;
+  // Promocionar clave mínima de la nueva hoja al padre
+  std::string clavePromocionada = nuevaHoja->claves[0];
+  // Si la hoja es raíz
+  if (cat->raiz == hoja)
+  {
+    BPlusNode *nuevaRaiz = new BPlusNode(grado, false);
+    nuevaRaiz->claves[0] = clavePromocionada;
+    nuevaRaiz->numClaves = 1;
+    nuevaRaiz->hijos[0] = hoja;
+    nuevaRaiz->hijos[1] = nuevaHoja;
+    nuevaRaiz->numHijos = 2;
+    cat->raiz = nuevaRaiz;
+  }
+  else
+  {
+    // Propagar hacia arriba (implementación pendiente para nodos internos)
+    // ...
+  }
+}
+
+// Inserción atómica por categoría (con división de hoja)
 bool ArbolBPlus::insertarProducto(const Product &producto, std::string &errorRollback)
 {
   CategoriaNodo *cat = crearOCapturarCategoria(producto.getCategory());
   if (!cat->raiz)
     cat->raiz = new BPlusNode(grado, true);
+  // Buscar hoja destino
+  BPlusNode *hoja = buscarHojaDestino(cat->raiz, producto.getBarcode());
+  // Validar unicidad
+  for (int i = 0; i < hoja->numClaves; ++i)
+  {
+    if (hoja->claves[i] == producto.getBarcode())
+    {
+      errorRollback = "Clave duplicada";
+      return false;
+    }
+  }
 
-  // Inserción en hoja (simulación, sin rebalanceo)
-  Nodo *nuevo = new Nodo(new Product(producto));
-  nuevo->setNext(cat->raiz->productos);
-  if (cat->raiz->productos)
-    cat->raiz->productos->setPrev(nuevo);
-  cat->raiz->productos = nuevo;
-  cat->raiz->numClaves++;
+  // Insertar en hoja
+  insertarEnHoja(hoja, producto.getBarcode(), new Product(producto));
 
-  // Aquí iría la lógica real de inserción y rebalanceo
+  // Si la hoja se desborda, dividir
+  if (hoja->numClaves == grado)
+  {
+    dividirHoja(cat, hoja);
+  }
   return true;
 }
 

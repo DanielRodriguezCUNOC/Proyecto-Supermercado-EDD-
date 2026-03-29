@@ -58,11 +58,17 @@ private:
     int grado;
     CategoriaNodo *categorias;
 
+    // Métodos para lógica interna
     CategoriaNodo *buscarCategoria(const std::string &nombre) const;
     CategoriaNodo *crearOCapturarCategoria(const std::string &nombre);
     void liberarCategorias();
     void rollbackInsercion(CategoriaNodo *categoria, const std::string &codigoBarra);
     void rollbackEliminacion(CategoriaNodo *categoria, Product *producto);
+
+    // Métodos para inserción y rebalanceo
+    BPlusNode *buscarHojaDestino(BPlusNode *raiz, const std::string &clave);
+    void insertarEnHoja(BPlusNode *hoja, const std::string &clave, Product *producto);
+    void dividirHoja(CategoriaNodo *cat, BPlusNode *hoja);
 };
 
 #endif // ARBOLBPLUS_H
