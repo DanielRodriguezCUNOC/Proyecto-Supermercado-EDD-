@@ -1,10 +1,11 @@
 #ifndef APPCONTROLLER_H
 #define APPCONTROLLER_H
+
 #include <QObject>
 #include "estructurascontroller.h"
 #include "filecontroller.h"
-#include "pantallas/pantallasistema.h"
 #include "viewcontroller.h"
+#include "../view/pantallas/pantallasistema.h"
 
 class AppController : public QObject
 {
@@ -12,15 +13,20 @@ class AppController : public QObject
 
 private:
     PantallaSistema* vistaSistema;
-    EstructurasController* sistemaController;
+    EstructurasController* estructurasController;
     FileController* fileController;
     ViewController* viewController;
 
 private slots:
-    void agregarProducto();
+    // Slot intermedio para manejar la interacción de la vista
+    void onAgregarProducto();
 
 public:
-    AppController();
+    AppController(QObject *parent = nullptr);
+    ~AppController();
+
+    // Método para arrancar la aplicación
+    void iniciar();
 };
 
 #endif // APPCONTROLLER_H
