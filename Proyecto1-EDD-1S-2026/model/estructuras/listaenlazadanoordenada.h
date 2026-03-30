@@ -18,6 +18,7 @@ public:
     void eliminar(Product *product);
     int getSize() const;
     bool isEmpty() const;
+    std::string generarDOT() const;
 };
 
 #endif // LISTAENLAZADANOORDENADA_H

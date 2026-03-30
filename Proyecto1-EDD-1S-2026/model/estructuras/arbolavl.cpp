@@ -224,3 +224,32 @@ void ArbolAVL::inOrderRec(NodoAVL* root) const {
         inOrderRec(root->der);
     }
 }
+
+#include <sstream>
+
+static void generarDOTArbolAVLRec(NodoAVL* nodo, std::stringstream& ss) {
+    if (!nodo) return;
+    long id = reinterpret_cast<long>(nodo);
+    
+    ss << "  node" << id << " [label=\"" << nodo->producto.getName() << "\\n" << nodo->producto.getBarcode() << "\"];\n";
+
+    if (nodo->izq) {
+        long hid = reinterpret_cast<long>(nodo->izq);
+        ss << "  node" << id << " -> node" << hid << ";\n";
+        generarDOTArbolAVLRec(nodo->izq, ss);
+    }
+    if (nodo->der) {
+        long hid = reinterpret_cast<long>(nodo->der);
+        ss << "  node" << id << " -> node" << hid << ";\n";
+        generarDOTArbolAVLRec(nodo->der, ss);
+    }
+}
+
+std::string ArbolAVL::generarDOT() const {
+    std::stringstream ss;
+    ss << "digraph AVLTree {\n";
+    ss << "  node [shape=oval, style=filled, fillcolor=\"#FCE4EC\", color=\"#880E4F\"];\n";
+    if (raiz) generarDOTArbolAVLRec(raiz, ss);
+    ss << "}\n";
+    return ss.str();
+}

@@ -275,3 +275,40 @@ std::string ArbolBPlus::exportarCSV() const
     }
     return oss.str();
 }
+
+static void generarDOTArbolBPlusRec(BPlusNode* nodo, std::ostringstream& ss) {
+    if (!nodo) return;
+    long id = reinterpret_cast<long>(nodo);
+    
+    ss << "  node" << id << " [label=\"";
+    for(int i=0; i<nodo->numClaves; i++) {
+        ss << "<f" << i << "> " << nodo->claves[i];
+        if(i != nodo->numClaves - 1) ss << " | ";
+    }
+    ss << "\"];\n";
+
+    if (!nodo->esHoja) {
+        for(int i=0; i<=nodo->numClaves; i++) {
+            if(nodo->hijos[i]) {
+                long hid = reinterpret_cast<long>(nodo->hijos[i]);
+                ss << "  node" << id << ":f" << i << " -> node" << hid << ";\n";
+                generarDOTArbolBPlusRec(nodo->hijos[i], ss);
+            }
+        }
+    } else {
+        // Enlazar al siguiente nodo hoja
+        if (nodo->siguienteHoja) {
+            long sigId = reinterpret_cast<long>(nodo->siguienteHoja);
+            ss << "  node" << id << " -> node" << sigId << " [color=\"blue\", style=\"dashed\"];\n";
+        }
+    }
+}
+
+std::string ArbolBPlus::generarDOT() const {
+    std::ostringstream ss;
+    ss << "digraph BPlusTree {\n";
+    ss << "  node [shape=record, style=filled, fillcolor=\"#E1BEE7\", color=\"#4A148C\"];\n";
+    if (raiz) generarDOTArbolBPlusRec(raiz, ss);
+    ss << "}\n";
+    return ss.str();
+}

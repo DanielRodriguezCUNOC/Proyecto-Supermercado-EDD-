@@ -24,6 +24,13 @@ public:
         ArbolB *arbolB,
         ArbolBPlus *arbolBPlus,
         ArbolAVL *arbolAVL);
+
+    ListaEnlazadaNoOrdenada* getUnorderedList() const { return unorderedList; }
+    ListaEnlazadaOrdenada* getListaOrdenada() const { return listaOrdenada; }
+    ArbolB* getArbolB() const { return arbolB; }
+    ArbolBPlus* getArbolBPlus() const { return arbolBPlus; }
+    ArbolAVL* getArbolAVL() const { return arbolAVL; }
+
 public slots:
     void agregarProducto(std::string name,
                          std::string barcode,

@@ -293,3 +293,35 @@ ListaResultados* ArbolB::buscarPorCaducidad(const std::string &desde, const std:
     }
     return resultados;
 }
+
+#include <sstream>
+
+static void generarDOTArbolBRec(NodoB* nodo, std::stringstream& ss) {
+    if (!nodo) return;
+    long id = reinterpret_cast<long>(nodo);
+    ss << "  node" << id << " [label=\"";
+    for(int i=0; i<nodo->n; i++) {
+        ss << "<f" << i << "> " << nodo->claves[i].getExpiryDate();
+        if(i != nodo->n - 1) ss << " | ";
+    }
+    ss << "\"];\n";
+
+    if (!nodo->hoja) {
+        for(int i=0; i<=nodo->n; i++) {
+            if(nodo->hijos[i]) {
+                long hid = reinterpret_cast<long>(nodo->hijos[i]);
+                ss << "  node" << id << ":f" << i << " -> node" << hid << ";\n";
+                generarDOTArbolBRec(nodo->hijos[i], ss);
+            }
+        }
+    }
+}
+
+std::string ArbolB::generarDOT() const {
+    std::stringstream ss;
+    ss << "digraph BTree {\n";
+    ss << "  node [shape=record, style=filled, fillcolor=\"#FFF3E0\", color=\"#E65100\"];\n";
+    if (raiz) generarDOTArbolBRec(raiz, ss);
+    ss << "}\n";
+    return ss.str();
+}

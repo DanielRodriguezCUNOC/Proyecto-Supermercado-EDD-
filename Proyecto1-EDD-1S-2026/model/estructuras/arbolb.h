@@ -5,7 +5,7 @@
 
 class Product;
 
-// Nodo del Árbol B específico para Product (fechas de caducidad)
+// Nodo del Árbol B específico para Product
 class NodoB
 {
 public:
@@ -83,6 +83,7 @@ public:
 
     void insertar(const Product &k);
     void imprimir();
+    std::string generarDOT() const;
     
     // Retorna una lista con los productos que cumplen el rango de caducidad
     ListaResultados* buscarPorCaducidad(const std::string &desde, const std::string &hasta);
