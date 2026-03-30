@@ -97,3 +97,22 @@ bool ListaEnlazadaNoOrdenada::isEmpty() const
 {
   return this->cabeza == nullptr;
 }
+
+#include <sstream>
+
+std::string ListaEnlazadaNoOrdenada::generarDOT() const {
+    std::stringstream ss;
+    ss << "digraph G {\n";
+    ss << "  rankdir=LR;\n";
+    ss << "  node [shape=record, style=filled, fillcolor=\"#E3F2FD\", color=\"#1565C0\"];\n";
+    Nodo* act = cabeza;
+    int i = 0;
+    while(act) {
+        ss << "  node" << i << " [label=\"{ " << act->getValue()->getName() << " | " << act->getValue()->getBarcode() << " }\"];\n";
+        if(i > 0) ss << "  node" << (i-1) << " -> node" << i << ";\n";
+        act = act->getNext();
+        i++;
+    }
+    ss << "}\n";
+    return ss.str();
+}

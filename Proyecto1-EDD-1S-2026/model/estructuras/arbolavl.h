@@ -44,6 +44,8 @@ public:
     
     // Imprimir ordenado por nombre
     void listarPorNombre() const;
+
+    std::string generarDOT() const;
 };
 
 #endif // ARBOLAVL_H

@@ -34,6 +34,7 @@ public:
     void buscarPorCategoria(const std::string &categoria, Nodo *&resultado) const;
     bool eliminarProducto(const std::string &codigoBarra, std::string &errorRollback);
     std::string exportarCSV() const;
+    std::string generarDOT() const;
 
 private:
     void destruirRec(BPlusNode *nodo);
