@@ -1,6 +1,7 @@
 #ifndef ARBOLB_H
 #define ARBOLB_H
 
+#include "entidades/product.h"
 #include <string>
 
 class Product;

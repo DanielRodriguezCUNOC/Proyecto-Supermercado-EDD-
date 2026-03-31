@@ -1,5 +1,5 @@
 #include "arbolb.h"
-#include "../entidades/product.h"
+#include "model/entidades/product.h"
 #include <iostream>
 using namespace std;
 

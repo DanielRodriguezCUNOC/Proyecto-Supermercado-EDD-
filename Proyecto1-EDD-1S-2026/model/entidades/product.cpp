@@ -1,5 +1,7 @@
 #include "product.h"
 
+Product::Product(){}
+
 Product::Product(std::string name,
                  std::string barcode,
                  std::string category,

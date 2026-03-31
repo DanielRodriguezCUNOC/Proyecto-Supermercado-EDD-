@@ -1,3 +1,5 @@
+#include "listaenlazadaordenada.h"
+#include <sstream>
 void ListaEnlazadaOrdenada::eliminar(Product *product)
 {
   if (isEmpty()) return;
@@ -24,7 +26,7 @@ void ListaEnlazadaOrdenada::eliminar(Product *product)
     actual = actual->getNext();
   }
 }
-#include "listaenlazadaordenada.h"
+
 
 ListaEnlazadaOrdenada::ListaEnlazadaOrdenada() : cabeza(nullptr), cola(nullptr), size(0) {}
 
@@ -103,7 +105,6 @@ bool ListaEnlazadaOrdenada::isEmpty() const
   return cabeza == nullptr;
 }
 
-#include <sstream>
 
 std::string ListaEnlazadaOrdenada::generarDOT() const {
     std::stringstream ss;

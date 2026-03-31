@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QString>
-#include "../entidades/product.h"
+#include "model/entidades/product.h"
 
 class FileController : public QObject
 {

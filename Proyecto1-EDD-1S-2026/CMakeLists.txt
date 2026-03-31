@@ -29,6 +29,14 @@ qt_add_executable(Proyecto1-EDD-1S-2026
     controller/appcontroller.h controller/appcontroller.cpp
     controller/buscarcontroller.h controller/buscarcontroller.cpp
     model/estructuras/arbolavl.h model/estructuras/arbolavl.cpp
+     view/pantallas/pantallaagregarproducto.h  view/pantallas/pantallaagregarproducto.cpp  view/pantallas/pantallaagregarproducto.ui
+     view/pantallas/pantallamostrarcsv.h view/pantallas/pantallamostrarcsv.cpp view/pantallas/pantallamostrarcsv.ui
+     view/pantallas/pantallaeliminar.h view/pantallas/pantallaeliminar.cpp view/pantallas/pantallaeliminar.ui
+     view/pantallas/pantallabuscarpornombre.h view/pantallas/pantallabuscarpornombre.cpp view/pantallas/pantallabuscarpornombre.ui
+     view/pantallas/pantallabuscarporcategoria.h view/pantallas/pantallabuscarporcategoria.cpp view/pantallas/pantallabuscarporcategoria.ui
+     view/pantallas/pantallabuscarporrangocaducidad.h view/pantallas/pantallabuscarporrangocaducidad.cpp view/pantallas/pantallabuscarporrangocaducidad.ui
+     view/pantallas/pantallalistarpornombre.h view/pantallas/pantallalistarpornombre.cpp view/pantallas/pantallalistarpornombre.ui
+     view/pantallas/pantallacompararbusquedas.h view/pantallas/pantallacompararbusquedas.cpp view/pantallas/pantallacompararbusquedas.ui
 
 )
 
