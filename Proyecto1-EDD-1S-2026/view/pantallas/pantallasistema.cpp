@@ -1,15 +1,21 @@
 #include "pantallasistema.h"
 #include "ui_pantallasistema.h"
+#include "view/pantallas/pantallaeliminar.h"
+#include "view/pantallas/pantallabuscarporcategoria.h"
+#include "view/pantallas/pantallabuscarpornombre.h"
+#include "view/pantallas/pantallabuscarporrangocaducidad.h"
+#include "view/pantallas/pantallalistarpornombre.h"
+#include "view/pantallas/pantallamostrarcsv.h"
+#include "controller/appcontroller.h"
 #include <QTimer>
 #include <QTime>
 #include <QDate>
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
-
+#include <QFileDialog>
 
 PantallaSistema::PantallaSistema(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::PantallaSistema)
+    : QWidget(parent), ui(new Ui::PantallaSistema)
 {
     ui->setupUi(this);
 
@@ -138,7 +144,7 @@ QLCDNumber {
 
 QLabel#lblFecha{
     font-size: 28px;
-    font-weight: bold
+    font-weight: bold;
 }
 
 )");
@@ -151,8 +157,8 @@ QLabel#lblFecha{
     ui->btnCargarArchivo->setText("Cargar Archivo");
     ui->btnVerArbol->setText("Visualizar Arboles");
 
-//* Elimina los botones de minimizar, etc.
-setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+    //* Elimina los botones de minimizar, etc.
+    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     //* Evitar doble scroll en los graphics view
     ui->gvListaEnlazadaNoOrdenada->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->gvListaEnlazadaNoOrdenada->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -171,7 +177,7 @@ setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     ui->gvArbolBPlus->setScene(scene4);
 
     mostrarArboles();
-
+    inicializarPantallas();
 }
 
 PantallaSistema::~PantallaSistema()
@@ -179,7 +185,8 @@ PantallaSistema::~PantallaSistema()
     delete ui;
 }
 
-void PantallaSistema::actualizarReloj(){
+void PantallaSistema::actualizarReloj()
+{
     QTime hora = QTime::currentTime();
     QDate fecha = QDate::currentDate();
 
@@ -196,23 +203,103 @@ void PantallaSistema::mostrarArboles()
     scene2->clear();
     scene3->clear();
     scene4->clear();
-
-    QPixmap imagen1("/home/luluwalilith/Imágenes/fondos/266089.jpg");
-    QPixmap imagen2("/home/luluwalilith/Imágenes/fondos/1358899.png");
-    QPixmap imagen3("/home/luluwalilith/Imágenes/fondos/Claymore.jpg");
-    QPixmap imagen4("/home/luluwalilith/Imágenes/fondos/nebulosa-de-carina_23f22b15.png");
-
-    scene1->addPixmap(imagen1);
-    scene2->addPixmap(imagen2);
-    scene3->addPixmap(imagen3);
-    scene4->addPixmap(imagen4);
-
-    ui->gvListaEnlazadaNoOrdenada->fitInView(scene1->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvListaEnlazadaOrdenada->fitInView(scene2->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvArbolB->fitInView(scene3->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvArbolBPlus->fitInView(scene4->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-void PantallaSistema::btnAgregarClicked(){
-    emit agregarProducto();
+void PantallaSistema::btnAgregarClicked()
+{
+    emit addProducto();
+}
+
+void PantallaSistema::inicializarPantallas()
+{
+    agregarProducto = new PantallaAgregarProducto(this);
+    PantallaEliminar *eliminarProducto = new PantallaEliminar(this);
+    PantallaBuscarPorCategoria *buscarCategoria = new PantallaBuscarPorCategoria(this);
+    PantallaBuscarPorRangoCaducidad *buscarRango = new PantallaBuscarPorRangoCaducidad(this);
+    PantallaBuscarPorNombre *buscarNombre = new PantallaBuscarPorNombre(this);
+    PantallaListarPorNombre *listarNombre = new PantallaListarPorNombre(this);
+    mostrarCSV = new PantallaMostrarCSV(this);
+
+    // Agregar pantallas al stackedWidget
+    ui->stackedWidget->addWidget(mostrarCSV);
+    ui->stackedWidget->addWidget(agregarProducto);
+    ui->stackedWidget->addWidget(eliminarProducto);
+    ui->stackedWidget->addWidget(buscarNombre);
+    ui->stackedWidget->addWidget(buscarCategoria);
+    ui->stackedWidget->addWidget(buscarRango);
+    ui->stackedWidget->addWidget(listarNombre);
+
+    // Conectar al controlador principal
+    if (appController)
+    {
+        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
+                appController, &AppController::agregarProducto);
+    }
+
+    // Conectar botones a los cambios de pantalla
+
+    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]()
+            {
+        const QString ruta = QFileDialog::getOpenFileName(
+            this,
+            "Seleccionar archivo CSV",
+            QString(),
+            "Archivos CSV (*.csv);;Todos los archivos (*)");
+
+        if (ruta.isEmpty()) {
+            return;
+        }
+
+        ui->stackedWidget->setCurrentWidget(mostrarCSV);
+        emit archivoCSVSeleccionado(ruta); });
+    connect(ui->btnAgregar, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(agregarProducto); });
+    connect(ui->btnEliminar, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(eliminarProducto); });
+    connect(ui->btnBuscarPorNombre, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarNombre); });
+    connect(ui->btnBuscarPorCategoria, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarCategoria); });
+    connect(ui->btnBuscarPorCaducidad, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarRango); });
+    connect(ui->btnListarPorNombre, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(listarNombre); });
+
+    // Pantalla inicial visible
+    ui->stackedWidget->setCurrentWidget(mostrarCSV);
+}
+
+void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)
+{
+    if (mostrarCSV) {
+        mostrarCSV->mostrarDatos(productos);
+    }
+}
+
+QGraphicsView *PantallaSistema::getViewListaNoOrdenada()
+{
+    return ui ? ui->gvListaEnlazadaNoOrdenada : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewListaOrdenada()
+{
+    return ui ? ui->gvListaEnlazadaOrdenada : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolB()
+{
+    return ui ? ui->gvArbolB : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolBPlus()
+{
+    return ui ? ui->gvArbolBPlus : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolAVL()
+{
+
+    return ui ? ui->gvArbolAVL : nullptr;
+    // Si da clavos descomentar esta línea y comentar la de arriba, es un parche temporal para evitar que se caiga la aplicación al no tener implementada la vista del AVL
+    // return nullptr;
 }

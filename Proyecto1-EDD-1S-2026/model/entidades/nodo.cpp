@@ -1,6 +1,6 @@
 #include "nodo.h"
 
-Nodo::Nodo() {}
+Nodo::Nodo() : product(nullptr), next(nullptr), prev(nullptr) {}
 Nodo::Nodo(Product *product) : product(product), next(nullptr), prev(nullptr) {}
 
 Product *Nodo::getValue() const

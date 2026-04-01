@@ -21,10 +21,18 @@ private:
     ArbolBPlus* bplustree;
     ArbolAVL* avl;
 
+    QGraphicsView* viewListaNoOrd;
+    QGraphicsView* viewListaOrd;
+    QGraphicsView* viewArbolB;
+    QGraphicsView* viewArbolBPlus;
+    QGraphicsView* viewArbolAVL;
+
     void renderizarYMostrar(const std::string& dotContent, const QString& baseName, QGraphicsView* view);
 
 public:
-    ViewController(ListaEnlazadaNoOrdenada* l1, ListaEnlazadaOrdenada* l2, ArbolB* b, ArbolBPlus* bp, ArbolAVL* a);
+    ViewController(ListaEnlazadaNoOrdenada* l1, ListaEnlazadaOrdenada* l2, ArbolB* b, ArbolBPlus* bp, ArbolAVL* a,
+                   QGraphicsView* vl1 = nullptr, QGraphicsView* vl2 = nullptr, 
+                   QGraphicsView* vb = nullptr, QGraphicsView* vbp = nullptr, QGraphicsView* va = nullptr);
 
     void mostrarListaDesordenada(QGraphicsView *view);
     void mostrarListaOrdenada(QGraphicsView *view);

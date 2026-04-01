@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string notr="true">Supermercado el Bosque</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QFrame" name="header">
@@ -124,23 +127,6 @@
        <string>Ver Ar</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>80</y>
-        <width>661</width>
-        <height>681</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(0,0,0);
-color: rgb(255,255,255);</string>
-      </property>
-      <property name="text">
-       <string>Aqui va el contenido del archivo CSV</string>
-      </property>
-     </widget>
      <widget class="QScrollArea" name="scrollArea">
       <property name="geometry">
        <rect>
@@ -165,7 +151,7 @@ color: rgb(255,255,255);</string>
          <x>0</x>
          <y>0</y>
          <width>1155</width>
-         <height>2200</height>
+         <height>2900</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -177,7 +163,7 @@ color: rgb(255,255,255);</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>2200</height>
+         <height>2900</height>
         </size>
        </property>
        <widget class="QWidget" name="layoutWidget">
@@ -186,12 +172,24 @@ color: rgb(255,255,255);</string>
           <x>10</x>
           <y>10</y>
           <width>1121</width>
-          <height>2171</height>
+          <height>2861</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGraphicsView" name="gvListaEnlazadaNoOrdenada">
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Lista No Ordenada</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvListaEnlazadaNoOrdenada">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -207,7 +205,19 @@ color: rgb(255,255,255);</string>
           </widget>
          </item>
          <item>
-          <widget class="QGraphicsView" name="gvListaEnlazadaOrdenada">
+          <widget class="QLabel" name="label_2">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Lista Ordenada</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvListaEnlazadaOrdenada">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -219,6 +229,18 @@ color: rgb(255,255,255);</string>
              <width>0</width>
              <height>500</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol B</string>
            </property>
           </widget>
          </item>
@@ -239,7 +261,19 @@ color: rgb(255,255,255);</string>
           </widget>
          </item>
          <item>
-          <widget class="QGraphicsView" name="gvArbolBPlus">
+          <widget class="QLabel" name="label_4">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol B+</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvArbolBPlus">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -254,9 +288,56 @@ color: rgb(255,255,255);</string>
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol AVL</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvArbolAVL">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>500</height>
+            </size>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </widget>
+     </widget>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>79</y>
+        <width>651</width>
+        <height>671</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>651</width>
+        <height>671</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>651</width>
+        <height>671</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
      </widget>
     </widget>
    </item>
@@ -329,7 +410,7 @@ color: rgb(255,255,255);</string>
        </rect>
       </property>
       <property name="text">
-       <string>buscar por nombre de barra</string>
+       <string>buscar por codigo de barra</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnBuscarPorCategoria">
