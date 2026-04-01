@@ -332,7 +332,18 @@ static void generarDOTArbolBPlusRec(BPlusNode* nodo, std::ostringstream& ss) {
     // <p0> es el slot visual para punteros en Graphviz, luego va un texto, luego otro slot <p1>...
     ss << "  node" << id << " [label=\"";
     for(int i=0; i<nodo->numClaves; i++) {
-        ss << "<p" << i << "> | " << nodo->claves[i] << " | ";
+        ss << "<p" << i << "> | " << nodo->claves[i];
+        
+        // Si es hoja, muestra todos los productos
+        if (nodo->esHoja && nodo->productos[i] != nullptr) {
+            Nodo* act = nodo->productos[i];
+            while (act) {
+                ss << "\\n[" << act->getValue()->getBarcode() << "] " << act->getValue()->getName();
+                act = act->getNext();
+            }
+        }
+        
+        ss << " | ";
     }
     ss << "<p" << nodo->numClaves << ">\"];\n";
 
