@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string notr="true">Supermercado el Bosque</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QFrame" name="header">
@@ -250,18 +253,21 @@
         <height>671</height>
        </rect>
       </property>
-      <property name="currentIndex">
-       <number>8</number>
+      <property name="minimumSize">
+       <size>
+        <width>651</width>
+        <height>671</height>
+       </size>
       </property>
-      <widget class="QWidget" name="wMostrarCSV"/>
-      <widget class="QWidget" name="wAgregarProducto"/>
-      <widget class="QWidget" name="wEliminar"/>
-      <widget class="QWidget" name="wBuscarPorNombre"/>
-      <widget class="QWidget" name="wBuscarPorCodigoBarra"/>
-      <widget class="QWidget" name="wBuscarPorCategoria"/>
-      <widget class="QWidget" name="wBuscarPorCaducidad"/>
-      <widget class="QWidget" name="wListarPorNombre"/>
-      <widget class="QWidget" name="wCompararBusquedas"/>
+      <property name="maximumSize">
+       <size>
+        <width>651</width>
+        <height>671</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
      </widget>
     </widget>
    </item>

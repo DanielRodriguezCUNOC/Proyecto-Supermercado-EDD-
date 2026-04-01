@@ -36,7 +36,7 @@ qt_add_executable(Proyecto1-EDD-1S-2026
      view/pantallas/pantallabuscarporcategoria.h view/pantallas/pantallabuscarporcategoria.cpp view/pantallas/pantallabuscarporcategoria.ui
      view/pantallas/pantallabuscarporrangocaducidad.h view/pantallas/pantallabuscarporrangocaducidad.cpp view/pantallas/pantallabuscarporrangocaducidad.ui
      view/pantallas/pantallalistarpornombre.h view/pantallas/pantallalistarpornombre.cpp view/pantallas/pantallalistarpornombre.ui
-     view/pantallas/pantallacompararbusquedas.h view/pantallas/pantallacompararbusquedas.cpp view/pantallas/pantallacompararbusquedas.ui
+
 
 )
 

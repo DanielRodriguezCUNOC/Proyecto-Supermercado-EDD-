@@ -14,9 +14,9 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QWidget#PantallaMostrarCSV { background-color: #1E2228; }</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QScrollArea" name="scrollArea">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -25,25 +25,22 @@
      <height>671</height>
     </rect>
    </property>
-   <property name="minimumSize">
-    <size>
-     <width>651</width>
-     <height>671</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>651</width>
-     <height>671</height>
-    </size>
-   </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(0, 0, 0);
-color: white;</string>
+    <string notr="true">background-color: White;</string>
    </property>
-   <property name="text">
-    <string>TextLabel</string>
+   <property name="widgetResizable">
+    <bool>true</bool>
    </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>649</width>
+      <height>669</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

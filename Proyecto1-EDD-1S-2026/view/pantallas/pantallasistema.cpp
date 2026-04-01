@@ -1,15 +1,20 @@
 #include "pantallasistema.h"
 #include "ui_pantallasistema.h"
+#include "view/pantallas/pantallaeliminar.h"
+#include "view/pantallas/pantallabuscarporcategoria.h"
+#include "view/pantallas/pantallabuscarpornombre.h"
+#include "view/pantallas/pantallabuscarporrangocaducidad.h"
+#include "view/pantallas/pantallalistarpornombre.h"
+#include "view/pantallas/pantallamostrarcsv.h"
+#include "controller/appcontroller.h"
 #include <QTimer>
 #include <QTime>
 #include <QDate>
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
 
-
 PantallaSistema::PantallaSistema(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::PantallaSistema)
+    : QWidget(parent), ui(new Ui::PantallaSistema)
 {
     ui->setupUi(this);
 
@@ -138,7 +143,7 @@ QLCDNumber {
 
 QLabel#lblFecha{
     font-size: 28px;
-    font-weight: bold
+    font-weight: bold;
 }
 
 )");
@@ -151,8 +156,8 @@ QLabel#lblFecha{
     ui->btnCargarArchivo->setText("Cargar Archivo");
     ui->btnVerArbol->setText("Visualizar Arboles");
 
-//* Elimina los botones de minimizar, etc.
-setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+    //* Elimina los botones de minimizar, etc.
+    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     //* Evitar doble scroll en los graphics view
     ui->gvListaEnlazadaNoOrdenada->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->gvListaEnlazadaNoOrdenada->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -171,7 +176,7 @@ setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     ui->gvArbolBPlus->setScene(scene4);
 
     mostrarArboles();
-
+    inicializarPantallas();
 }
 
 PantallaSistema::~PantallaSistema()
@@ -179,7 +184,8 @@ PantallaSistema::~PantallaSistema()
     delete ui;
 }
 
-void PantallaSistema::actualizarReloj(){
+void PantallaSistema::actualizarReloj()
+{
     QTime hora = QTime::currentTime();
     QDate fecha = QDate::currentDate();
 
@@ -213,6 +219,54 @@ void PantallaSistema::mostrarArboles()
     ui->gvArbolBPlus->fitInView(scene4->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-void PantallaSistema::btnAgregarClicked(){
-    emit agregarProducto();
+void PantallaSistema::btnAgregarClicked()
+{
+    emit addProducto();
+}
+
+void PantallaSistema::inicializarPantallas()
+{
+    agregarProducto = new PantallaAgregarProducto(this);
+    PantallaEliminar *eliminarProducto = new PantallaEliminar(this);
+    PantallaBuscarPorCategoria *buscarCategoria = new PantallaBuscarPorCategoria(this);
+    PantallaBuscarPorRangoCaducidad *buscarRango = new PantallaBuscarPorRangoCaducidad(this);
+    PantallaBuscarPorNombre *buscarNombre = new PantallaBuscarPorNombre(this);
+    PantallaListarPorNombre *listarNombre = new PantallaListarPorNombre(this);
+    PantallaMostrarCSV *mostrarCSV = new PantallaMostrarCSV(this);
+
+    // Agregar pantallas al stackedWidget
+    ui->stackedWidget->addWidget(mostrarCSV);
+    ui->stackedWidget->addWidget(agregarProducto);
+    ui->stackedWidget->addWidget(eliminarProducto);
+    ui->stackedWidget->addWidget(buscarNombre);
+    ui->stackedWidget->addWidget(buscarCategoria);
+    ui->stackedWidget->addWidget(buscarRango);
+    ui->stackedWidget->addWidget(listarNombre);
+
+    // Conectar al controlador principal
+    if (appController)
+    {
+        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
+                appController, &AppController::agregarProducto);
+    }
+
+    // Conectar botones a los cambios de pantalla
+
+    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(mostrarCSV); });
+    connect(ui->btnAgregar, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(agregarProducto); });
+    connect(ui->btnEliminar, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(eliminarProducto); });
+    connect(ui->btnBuscarPorNombre, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarNombre); });
+    connect(ui->btnBuscarPorCategoria, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarCategoria); });
+    connect(ui->btnBuscarPorCaducidad, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(buscarRango); });
+    connect(ui->btnListarPorNombre, &QPushButton::clicked, [=]()
+            { ui->stackedWidget->setCurrentWidget(listarNombre); });
+
+    // Pantalla inicial visible
+    ui->stackedWidget->setCurrentWidget(mostrarCSV);
 }

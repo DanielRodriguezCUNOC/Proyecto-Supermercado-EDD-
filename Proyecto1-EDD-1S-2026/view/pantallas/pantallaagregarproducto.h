@@ -17,6 +17,9 @@ public:
 
 private:
     Ui::PantallaAgregarProducto *ui;
+signals:
+    void productoAgregado(const QString& nombre, const QString& codigoBarra, const QString& categoria,
+                          const QDate& fechaCaducidad, const QString& marca, double precio, int stock);
 };
 
 #endif // PANTALLAAGREGARPRODUCTO_H

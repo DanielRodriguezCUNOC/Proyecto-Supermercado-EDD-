@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #1E2228</string>
+   <string notr="true">QWidget#PantallaAgregarProducto { background-color: #1E2228; }</string>
   </property>
   <widget class="QLineEdit" name="lineEdit">
    <property name="geometry">
