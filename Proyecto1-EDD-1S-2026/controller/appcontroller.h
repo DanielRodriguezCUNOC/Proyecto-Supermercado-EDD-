@@ -31,6 +31,7 @@ public:
 public slots:
     void agregarProducto(const QString& nombre, const QString& codigoBarra, const QString& categoria,
                          const QDate& fechaCaducidad, const QString& marca, double precio, int stock);
+    void cargarArchivoCSV(const QString &ruta);
 };
 
 #endif // APPCONTROLLER_H

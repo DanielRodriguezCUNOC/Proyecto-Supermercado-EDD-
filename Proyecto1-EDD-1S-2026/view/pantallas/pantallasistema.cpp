@@ -12,6 +12,7 @@
 #include <QDate>
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
+#include <QFileDialog>
 
 PantallaSistema::PantallaSistema(QWidget *parent)
     : QWidget(parent), ui(new Ui::PantallaSistema)
@@ -252,8 +253,20 @@ void PantallaSistema::inicializarPantallas()
 
     // Conectar botones a los cambios de pantalla
 
-    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]()
-            { ui->stackedWidget->setCurrentWidget(mostrarCSV); });
+    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]() {
+        const QString ruta = QFileDialog::getOpenFileName(
+            this,
+            "Seleccionar archivo CSV",
+            QString(),
+            "Archivos CSV (*.csv);;Todos los archivos (*)");
+
+        if (ruta.isEmpty()) {
+            return;
+        }
+
+        ui->stackedWidget->setCurrentWidget(mostrarCSV);
+        emit archivoCSVSeleccionado(ruta);
+    });
     connect(ui->btnAgregar, &QPushButton::clicked, [=]()
             { ui->stackedWidget->setCurrentWidget(agregarProducto); });
     connect(ui->btnEliminar, &QPushButton::clicked, [=]()

@@ -36,6 +36,7 @@ private:
 
 signals:
     void addProducto();
+    void archivoCSVSeleccionado(const QString &ruta);
 };
 
 #endif // PANTALLASISTEMA_H

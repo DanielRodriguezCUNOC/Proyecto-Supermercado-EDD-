@@ -18,6 +18,9 @@ AppController::AppController(QObject *parent) : QObject(parent)
     // Instanciar la Vista Principal
     vistaSistema = new PantallaSistema();
     vistaSistema->setAppController(this);
+
+    connect(vistaSistema, &PantallaSistema::archivoCSVSeleccionado,
+            this, &AppController::cargarArchivoCSV);
 }
 
 AppController::~AppController()
@@ -45,4 +48,21 @@ void AppController::onAgregarProducto()
 void AppController::agregarProducto(const QString &nombre, const QString &codigoBarra, const QString &categoria,
                                     const QDate &fechaCaducidad, const QString &marca, double precio, int stock)
 {
+}
+
+void AppController::cargarArchivoCSV(const QString &ruta)
+{
+    const QList<Product> productos = fileController->cargarCSV(ruta);
+    qDebug() << "CSV cargado:" << ruta << "Productos válidos:" << productos.size();
+
+    for (const Product &p : productos) {
+        estructurasController->agregarProducto(
+            p.getName(),
+            p.getBarcode(),
+            p.getCategory(),
+            p.getExpiryDate(),
+            p.getBrand(),
+            p.getPrice(),
+            p.getStock());
+    }
 }
