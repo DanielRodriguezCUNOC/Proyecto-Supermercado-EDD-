@@ -3,6 +3,8 @@
 #include "view/pantallas/pantallaagregarproducto.h"
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QList>
+#include "model/entidades/product.h"
 
 namespace Ui
 {
@@ -10,6 +12,8 @@ namespace Ui
 }
 
 class AppController;
+class PantallaMostrarCSV;
+
 class PantallaSistema : public QWidget
 {
     Q_OBJECT
@@ -22,8 +26,16 @@ public:
     void mostrarArboles();
     void btnAgregarClicked();
     void inicializarPantallas();
+    void mostrarDatosCSV(const QList<Product>& productos);
 
     void setAppController(AppController *controller) { appController = controller; }
+    
+    // Getters para acceder a las QGraphicsViews desde ViewController
+    QGraphicsView* getViewListaNoOrdenada();
+    QGraphicsView* getViewListaOrdenada();
+    QGraphicsView* getViewArbolB();
+    QGraphicsView* getViewArbolBPlus();
+    QGraphicsView* getViewArbolAVL();
 
 private:
     Ui::PantallaSistema *ui;
@@ -33,6 +45,7 @@ private:
     QGraphicsScene *scene4;
     AppController *appController = nullptr;
     PantallaAgregarProducto *agregarProducto = nullptr;
+    PantallaMostrarCSV *mostrarCSV = nullptr;
 
 signals:
     void addProducto();

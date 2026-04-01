@@ -3,6 +3,7 @@
 
 using namespace std;
 
+// Creamos un nodo nuevo, siempre empieza con altura 1 porque no tiene hijos
 NodoAVL::NodoAVL(Product p) : producto(p), izq(nullptr), der(nullptr), altura(1) {}
 
 ArbolAVL::ArbolAVL() : raiz(nullptr) {}
@@ -11,6 +12,7 @@ ArbolAVL::~ArbolAVL() {
     destruirRec(raiz);
 }
 
+// Borra todo el árbol liberando la memoria, nodo por nodo de abajo hacia arriba
 void ArbolAVL::destruirRec(NodoAVL* nodo) {
     if (nodo != nullptr) {
         destruirRec(nodo->izq);
@@ -19,45 +21,53 @@ void ArbolAVL::destruirRec(NodoAVL* nodo) {
     }
 }
 
+// Solo nos dice qué tan alto es un nodo de forma segura sin lanzar error si es nulo
 int ArbolAVL::obtenerAltura(NodoAVL* N) {
     if (N == nullptr) return 0;
     return N->altura;
 }
 
+// Solo dice cuál de dos números es más grande
 int ArbolAVL::max(int a, int b) {
     return (a > b) ? a : b;
 }
 
+// Cuando el árbol pesa mucho del lado izquierdo, hacemos un giro a la derecha para emparejarlo
 NodoAVL* ArbolAVL::rotacionDerecha(NodoAVL* y) {
     NodoAVL* x = y->izq;
-    NodoAVL* T2 = x->der;
+    NodoAVL* hijoDerechoDeX = x->der;
 
-    // Realizar rotación
+    // Hacemos el movimiento
     x->der = y;
-    y->izq = T2;
+    y->izq = hijoDerechoDeX;
 
-    // Actualizar alturas
+    // Volvemos a calcular las alturas de los nodos que movimos
     y->altura = max(obtenerAltura(y->izq), obtenerAltura(y->der)) + 1;
     x->altura = max(obtenerAltura(x->izq), obtenerAltura(x->der)) + 1;
 
+    // x es ahora la nueva cabeza de este pedacito de árbol
     return x;
 }
 
+// Cuando el árbol pesa mucho del lado derecho, giramos a la izquierda
 NodoAVL* ArbolAVL::rotacionIzquierda(NodoAVL* x) {
     NodoAVL* y = x->der;
-    NodoAVL* T2 = y->izq;
+    NodoAVL* hijoIzquierdoDeY = y->izq;
 
-    // Realizar rotación
+    // Hacemos el movimiento
     y->izq = x;
-    x->der = T2;
+    x->der = hijoIzquierdoDeY;
 
-    // Actualizar alturas
+    // Calculamos cómo quedaron de altos
     x->altura = max(obtenerAltura(x->izq), obtenerAltura(x->der)) + 1;
     y->altura = max(obtenerAltura(y->izq), obtenerAltura(y->der)) + 1;
 
-    return y; // Nueva raíz
+    // y se vuelve la nueva cabeza
+    return y;
 }
 
+// Nos dice la diferencia de altura entre el lado izquierdo y el derecho.
+// Si esto da más de 1 o menos de -1, el árbol está chueco y toca rotarlo.
 int ArbolAVL::obtenerBalance(NodoAVL* N) {
     if (N == nullptr) return 0;
     return obtenerAltura(N->izq) - obtenerAltura(N->der);
@@ -67,56 +77,60 @@ void ArbolAVL::insertar(const Product& producto) {
     raiz = insertarRec(raiz, producto);
 }
 
+// Esta es la parte difícil, metemos el producto y arreglamos el árbol si se desarmó
 NodoAVL* ArbolAVL::insertarRec(NodoAVL* nodo, const Product& producto) {
-    // 1. Inserción normal de BST guiada por el NOMBRE del producto
+    // Si llegamos a un espacio vacío, ahí creamos el nodo y paramos
     if (nodo == nullptr)
         return new NodoAVL(producto);
 
+    // Lo acomodamos por nombre. Si es menor a la izquierda, mayor a la derecha
     if (producto.getName() < nodo->producto.getName())
         nodo->izq = insertarRec(nodo->izq, producto);
     else if (producto.getName() > nodo->producto.getName())
         nodo->der = insertarRec(nodo->der, producto);
-    else // Si tienen el mismo nombre, comparamos por código de barras para no perder productos con igual nombre
+    else // Si se llaman igual, usamos su código de barras para desempatar
     {
         if (producto.getBarcode() < nodo->producto.getBarcode())
             nodo->izq = insertarRec(nodo->izq, producto);
         else if (producto.getBarcode() > nodo->producto.getBarcode())
             nodo->der = insertarRec(nodo->der, producto);
         else 
-            return nodo; // Duplicado exacto (no se permite inserción)
+            return nodo; // Si es el mismísimo producto repetido, no lo metemos
     }
 
-    // 2. Actualizar la altura del ancestro
+    // Ya metimos el producto, ahora actualizamos la altura para los cálculos
     nodo->altura = 1 + max(obtenerAltura(nodo->izq), obtenerAltura(nodo->der));
 
-    // 3. Obtener el factor de balance
+    // Revisamos si se desbalancearon los pesos
     int balance = obtenerBalance(nodo);
 
-    // Si el nodo se desbalancea, hay 4 casos:
+    // Hay cuatro formas en las que puede romperse el balance:
 
-    // Izquierda Izquierda
+    // 1. Está muy pesado a la izquierda y el nuevo hijo está a la izquierda
     if (balance > 1 && producto.getName() <= nodo->izq->producto.getName())
         return rotacionDerecha(nodo);
 
-    // Derecha Derecha
+    // 2. Está muy pesado a la derecha y el nuevo hijo está a la derecha
     if (balance < -1 && producto.getName() >= nodo->der->producto.getName())
         return rotacionIzquierda(nodo);
 
-    // Izquierda Derecha
+    // 3. Está pesado a la izquierda pero el nuevo hijo quedó metido como una rodilla hacia la derecha
     if (balance > 1 && producto.getName() > nodo->izq->producto.getName()) {
         nodo->izq = rotacionIzquierda(nodo->izq);
         return rotacionDerecha(nodo);
     }
 
-    // Derecha Izquierda
+    // 4. Está pesado a la derecha pero el hijo hizo una rodilla hacia la izquierda
     if (balance < -1 && producto.getName() < nodo->der->producto.getName()) {
         nodo->der = rotacionDerecha(nodo->der);
         return rotacionIzquierda(nodo);
     }
 
+    // Regresamos el nodo ya parejito
     return nodo;
 }
 
+// Busca el producto más a la izquierda (el que va primero en el abecedario)
 NodoAVL* ArbolAVL::nodoValorMinimo(NodoAVL* nodo) {
     NodoAVL* actual = nodo;
     while (actual->izq != nullptr)
@@ -124,58 +138,66 @@ NodoAVL* ArbolAVL::nodoValorMinimo(NodoAVL* nodo) {
     return actual;
 }
 
-//Elimina un producto del árbol
+// Elimina un producto por su código de barras
 void ArbolAVL::eliminar(const std::string& barcode) {
     raiz = eliminarRec(raiz, barcode); 
 }
 
-//Elimina un producto del árbol recursivamente
+// Busca el nodo a borrar arreglando el árbol al mismo tiempo en la bajada y subida
 NodoAVL* ArbolAVL::eliminarRec(NodoAVL* root, const std::string& barcode) {
     if (root == nullptr)
         return root;
 
-    // Dado que el AVL está ordenado por NOMBRE, buscar y borrar por código de barra es complejo.
-    // Buscamos en ambos lados como pre-order:
+    // Como el árbol está ordenado por nombre, buscar el código de barras significa
+    // que tenemos que revisar todas las ramas posibles en un "escáner completo"
     if (root->producto.getBarcode() != barcode) {
         NodoAVL* res = nullptr;
-        // Tratamos de buscar de un lado
+        // Revisamos de lado izquierdo
         if ((res = eliminarRec(root->izq, barcode)) != root->izq) {
             root->izq = res;
-        } else if ((res = eliminarRec(root->der, barcode)) != root->der) {
+        } 
+        // Si no estaba, revisamos de lado derecho
+        else if ((res = eliminarRec(root->der, barcode)) != root->der) {
             root->der = res;
         } else {
-            return root; // No encontrado aquí
+            return root; // No lo encontramos en todo el árbol
         }
     } else {
-        // Encontramos el nodo
+        // Encontramos al que queremos borrar
+        
+        // Si no tiene hijos o tiene solo uno
         if ((root->izq == nullptr) || (root->der == nullptr)) {
+            // Agarramos al único hijo o nos quedamos con nada
             NodoAVL* temp = root->izq ? root->izq : root->der;
+            
+            // Si no tenía nada, lo quitamos
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
             } else {
-                *root = *temp; // copiar contenido 
+                *root = *temp; // Copiamos la info del hijo asumiendo su lugar
             }
             delete temp;
         } else {
-            // Nodo con dos hijos, tomar min del derecho
+            // Si el nodo tiene sus dos hijos, le robamos la info al nodo más chico del lado derecho
+            // y luego mandamos a borrar ese nodo robado (que es más fácil porque está en una orilla)
             NodoAVL* temp = nodoValorMinimo(root->der);
             root->producto = temp->producto;
             root->der = eliminarRec(root->der, temp->producto.getBarcode());
         }
     }
 
-    // Si el árbol tenía solo un nodo
+    // Si borramos el último nodo, ya terminamos
     if (root == nullptr)
         return root;
 
-    // Actualizar altura
+    // Después de borrar toca actualizar la altura
     root->altura = 1 + max(obtenerAltura(root->izq), obtenerAltura(root->der));
 
-    // Obtener balance
+    // Revisamos que tanta diferencia hay entre izquierda y derecha
     int balance = obtenerBalance(root);
 
-    // Casos de desbalanceo
+    // Casos de desbalanceo (mismos que al agregar)
     if (balance > 1 && obtenerBalance(root->izq) >= 0)
         return rotacionDerecha(root);
 
@@ -195,20 +217,24 @@ NodoAVL* ArbolAVL::eliminarRec(NodoAVL* root, const std::string& barcode) {
     return root;
 }
 
+// Búsqueda rápida porque el árbol está ordenado desde el principio
 Product* ArbolAVL::buscarPorNombre(const std::string& nombre) const {
     NodoAVL* resultado = buscarRec(raiz, nombre);
     if (resultado) return &(resultado->producto);
     return nullptr;
 }
 
+// Emula buscar en el diccionario, si la letra es menor nos vamos izquierda, si no a la derecha
 NodoAVL* ArbolAVL::buscarRec(NodoAVL* root, const std::string& nombre) const {
+    // Terminamos si quedó nulo o si le dimos al clavo
     if (root == nullptr || root->producto.getName() == nombre)
         return root;
 
-    // Búsqueda binaria
+    // Si nos pasamos en el abecedario, doblamos a la izquierda
     if (root->producto.getName() < nombre)
         return buscarRec(root->der, nombre);
 
+    // De lo contrario a la derecha
     return buscarRec(root->izq, nombre);
 }
 
@@ -217,6 +243,7 @@ void ArbolAVL::listarPorNombre() const {
     cout << endl;
 }
 
+// Lo imprime ordenado (visitando izquierda, luego centro, luego derecha)
 void ArbolAVL::inOrderRec(NodoAVL* root) const {
     if (root != nullptr) {
         inOrderRec(root->izq);
@@ -227,12 +254,15 @@ void ArbolAVL::inOrderRec(NodoAVL* root) const {
 
 #include <sstream>
 
+// Función para generar el código para Graphviz (para dibujar el árbol)
 static void generarDOTArbolAVLRec(NodoAVL* nodo, std::stringstream& ss) {
     if (!nodo) return;
     long id = reinterpret_cast<long>(nodo);
     
+    // Hacemos que tenga forma de óvalo con colores
     ss << "  node" << id << " [label=\"" << nodo->producto.getName() << "\\n" << nodo->producto.getBarcode() << "\"];\n";
 
+    // Unimos las flechas a los hijos
     if (nodo->izq) {
         long hid = reinterpret_cast<long>(nodo->izq);
         ss << "  node" << id << " -> node" << hid << ";\n";
@@ -245,6 +275,7 @@ static void generarDOTArbolAVLRec(NodoAVL* nodo, std::stringstream& ss) {
     }
 }
 
+// Prepara y devuelve todo el código Graphviz para dibujar este árbol
 std::string ArbolAVL::generarDOT() const {
     std::stringstream ss;
     ss << "digraph AVLTree {\n";

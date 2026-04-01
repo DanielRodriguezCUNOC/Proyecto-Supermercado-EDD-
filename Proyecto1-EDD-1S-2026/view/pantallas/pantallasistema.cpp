@@ -203,21 +203,6 @@ void PantallaSistema::mostrarArboles()
     scene2->clear();
     scene3->clear();
     scene4->clear();
-
-    QPixmap imagen1("/home/luluwalilith/Imágenes/fondos/266089.jpg");
-    QPixmap imagen2("/home/luluwalilith/Imágenes/fondos/1358899.png");
-    QPixmap imagen3("/home/luluwalilith/Imágenes/fondos/Claymore.jpg");
-    QPixmap imagen4("/home/luluwalilith/Imágenes/fondos/nebulosa-de-carina_23f22b15.png");
-
-    scene1->addPixmap(imagen1);
-    scene2->addPixmap(imagen2);
-    scene3->addPixmap(imagen3);
-    scene4->addPixmap(imagen4);
-
-    ui->gvListaEnlazadaNoOrdenada->fitInView(scene1->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvListaEnlazadaOrdenada->fitInView(scene2->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvArbolB->fitInView(scene3->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->gvArbolBPlus->fitInView(scene4->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void PantallaSistema::btnAgregarClicked()
@@ -233,7 +218,7 @@ void PantallaSistema::inicializarPantallas()
     PantallaBuscarPorRangoCaducidad *buscarRango = new PantallaBuscarPorRangoCaducidad(this);
     PantallaBuscarPorNombre *buscarNombre = new PantallaBuscarPorNombre(this);
     PantallaListarPorNombre *listarNombre = new PantallaListarPorNombre(this);
-    PantallaMostrarCSV *mostrarCSV = new PantallaMostrarCSV(this);
+    mostrarCSV = new PantallaMostrarCSV(this);
 
     // Agregar pantallas al stackedWidget
     ui->stackedWidget->addWidget(mostrarCSV);
@@ -253,7 +238,8 @@ void PantallaSistema::inicializarPantallas()
 
     // Conectar botones a los cambios de pantalla
 
-    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]() {
+    connect(ui->btnCargarArchivo, &QPushButton::clicked, [=]()
+            {
         const QString ruta = QFileDialog::getOpenFileName(
             this,
             "Seleccionar archivo CSV",
@@ -265,8 +251,7 @@ void PantallaSistema::inicializarPantallas()
         }
 
         ui->stackedWidget->setCurrentWidget(mostrarCSV);
-        emit archivoCSVSeleccionado(ruta);
-    });
+        emit archivoCSVSeleccionado(ruta); });
     connect(ui->btnAgregar, &QPushButton::clicked, [=]()
             { ui->stackedWidget->setCurrentWidget(agregarProducto); });
     connect(ui->btnEliminar, &QPushButton::clicked, [=]()
@@ -282,4 +267,39 @@ void PantallaSistema::inicializarPantallas()
 
     // Pantalla inicial visible
     ui->stackedWidget->setCurrentWidget(mostrarCSV);
+}
+
+void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)
+{
+    if (mostrarCSV) {
+        mostrarCSV->mostrarDatos(productos);
+    }
+}
+
+QGraphicsView *PantallaSistema::getViewListaNoOrdenada()
+{
+    return ui ? ui->gvListaEnlazadaNoOrdenada : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewListaOrdenada()
+{
+    return ui ? ui->gvListaEnlazadaOrdenada : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolB()
+{
+    return ui ? ui->gvArbolB : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolBPlus()
+{
+    return ui ? ui->gvArbolBPlus : nullptr;
+}
+
+QGraphicsView *PantallaSistema::getViewArbolAVL()
+{
+
+    return ui ? ui->gvArbolAVL : nullptr;
+    // Si da clavos descomentar esta línea y comentar la de arriba, es un parche temporal para evitar que se caiga la aplicación al no tener implementada la vista del AVL
+    // return nullptr;
 }

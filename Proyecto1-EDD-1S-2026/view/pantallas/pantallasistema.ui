@@ -151,7 +151,7 @@
          <x>0</x>
          <y>0</y>
          <width>1155</width>
-         <height>2200</height>
+         <height>2900</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -163,7 +163,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>2200</height>
+         <height>2900</height>
         </size>
        </property>
        <widget class="QWidget" name="layoutWidget">
@@ -172,12 +172,24 @@
           <x>10</x>
           <y>10</y>
           <width>1121</width>
-          <height>2171</height>
+          <height>2861</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGraphicsView" name="gvListaEnlazadaNoOrdenada">
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Lista No Ordenada</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvListaEnlazadaNoOrdenada">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -193,7 +205,19 @@
           </widget>
          </item>
          <item>
-          <widget class="QGraphicsView" name="gvListaEnlazadaOrdenada">
+          <widget class="QLabel" name="label_2">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Lista Ordenada</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvListaEnlazadaOrdenada">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -205,6 +229,18 @@
              <width>0</width>
              <height>500</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol B</string>
            </property>
           </widget>
          </item>
@@ -225,13 +261,47 @@
           </widget>
          </item>
          <item>
-          <widget class="QGraphicsView" name="gvArbolBPlus">
+          <widget class="QLabel" name="label_4">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol B+</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvArbolBPlus">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>500</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="styleSheet">
+            <string notr="true">Background-color:black;
+color:white;
+font-size: 45px;</string>
+           </property>
+           <property name="text">
+            <string>Arbol AVL</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CustomGraphics" name="gvArbolAVL">
            <property name="minimumSize">
             <size>
              <width>0</width>

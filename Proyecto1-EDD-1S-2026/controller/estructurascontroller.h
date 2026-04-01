@@ -38,7 +38,9 @@ public slots:
                          std::string expiry_date,
                          std::string brand,
                          double price,
-                         int stock);
+                         int stock,
+                         bool emitirSenal = true);
+    void actualizarVistas();
     void eliminarProducto(std::string barcode);
 signals:
     void etructurasActualizadas();
