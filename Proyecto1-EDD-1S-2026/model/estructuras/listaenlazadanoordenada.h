@@ -1,6 +1,7 @@
 #ifndef LISTAENLAZADANOORDENADA_H
 #define LISTAENLAZADANOORDENADA_H
 #include "model/entidades/nodo.h"
+#include "listagenerica.h"
 
 // Una lista simple donde los productos se guardan sin ningún orden en especial.
 // Solo se van agregando uno tras otro.
@@ -37,7 +38,7 @@ public:
     std::string generarDOT() const;
     
     // Busca todos los productos con el mismo nombre
-    void buscarPorNombre(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const;
+    void buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const;
 };
 
 #endif // LISTAENLAZADANOORDENADA_H

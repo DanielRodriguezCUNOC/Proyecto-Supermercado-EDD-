@@ -1,6 +1,7 @@
 #ifndef ARBOLAVL_H
 #define ARBOLAVL_H
 
+#include "listagenerica.h"
 #include "../entidades/product.h"
 #include <string>
 
@@ -14,6 +15,7 @@ public:
 
     NodoAVL(Product p);
 };
+
 
 // El Árbol AVL es como un árbol binario normal, pero se asegura de no quedar inclinado
 // hacia un solo lado. Si lo hace, gira sus ramas para volver a estar parejito.
@@ -52,7 +54,7 @@ public:
     void listarPorNombre() const;
     
     // Busca todos los productos que coincidan con un nombre
-    void buscarPorNombreLista(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const;
+    void buscarPorNombreLista(const std::string& nombre, ListaGenerica<Product*>* resultados) const;
 
     // Genera el código para dibujar el árbol con Graphviz
     std::string generarDOT() const;

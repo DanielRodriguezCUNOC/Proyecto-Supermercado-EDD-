@@ -144,7 +144,7 @@ std::string ListaEnlazadaOrdenada::generarDOT() const {
     return ss.str();
 }
 
-void ListaEnlazadaOrdenada::buscarPorNombre(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const {
+void ListaEnlazadaOrdenada::buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const {
     Nodo* actual = cabeza;
     while (actual) {
         if (actual->getValue()->getName() == nombre) {

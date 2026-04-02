@@ -64,7 +64,7 @@ void PantallaBuscarPorNombre::limpiarResultados()
     ui->label_9->setText("");
 }
 
-void PantallaBuscarPorNombre::mostrarResultados(ListaEnlazadaNoOrdenada* resultados, long tUL, long tOL, long tAVL)
+void PantallaBuscarPorNombre::mostrarResultados(ListaGenerica<Product*>* resultados, long tUL, long tOL, long tAVL)
 {
     if (!resultados) return;
 
@@ -80,10 +80,10 @@ void PantallaBuscarPorNombre::mostrarResultados(ListaEnlazadaNoOrdenada* resulta
         lblNo->setStyleSheet("font-weight: bold; color: #E74C3C;");
         layout->addWidget(lblNo);
     } else {
-        // Recorremos la lista personalizada usando sus nodos
-        Nodo* actual = resultados->getCabeza();
+        // Recorremos la lista genérica usando NodoGenerico
+        NodoGenerico<Product*>* actual = resultados->getCabeza();
         while (actual) {
-            Product* p = actual->getValue();
+            Product* p = actual->valor;
             if (p) {
                 QFrame* card = new QFrame(this);
                 card->setStyleSheet("background-color: #F8F9F9; border: 1px solid #D5DBDB; border-radius: 5px; padding: 5px;");
@@ -102,16 +102,15 @@ void PantallaBuscarPorNombre::mostrarResultados(ListaEnlazadaNoOrdenada* resulta
                 cardLayout->addWidget(lblDetails);
                 layout->addWidget(card);
             }
-            actual = actual->getNext();
+            actual = actual->siguiente;
         }
     }
 
-    // Importante: Borrar la lista temporal de resultados para no dejar basura en memoria
-    // Primero borramos los productos que creamos con 'new' dentro de la búsqueda
-    Nodo* aux = resultados->getCabeza();
+    // Importante: Borrar la lista temporal de resultados y sus productos
+    NodoGenerico<Product*>* aux = resultados->getCabeza();
     while (aux) {
-        delete aux->getValue();
-        aux = aux->getNext();
+        delete aux->valor;
+        aux = aux->siguiente;
     }
     delete resultados;
 }

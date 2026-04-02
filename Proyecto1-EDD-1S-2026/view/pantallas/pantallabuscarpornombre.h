@@ -20,7 +20,7 @@ private:
     void limpiarResultados();
 
 public slots:
-    void mostrarResultados(ListaEnlazadaNoOrdenada* resultados, long tUL, long tOL, long tAVL);
+    void mostrarResultados(ListaGenerica<Product*>* resultados, long tUL, long tOL, long tAVL);
 
 private slots:
     void on_pushButton_clicked(); // Botón Buscar

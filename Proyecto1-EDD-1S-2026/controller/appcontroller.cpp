@@ -105,7 +105,7 @@ void AppController::cargarArchivoCSV(const QString &ruta)
 void AppController::buscarPorNombre(const QString &nombre)
 {
     long tUL = 0, tOL = 0, tAVL = 0;
-    ListaEnlazadaNoOrdenada* results = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
+    ListaGenerica<Product*>* results = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
     
     emit resultadosBusquedaNombre(results, tUL, tOL, tAVL);
 }

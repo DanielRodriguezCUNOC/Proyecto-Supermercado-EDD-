@@ -175,11 +175,10 @@ void EstructurasController::eliminarProducto(std::string barcode)
   emit etructurasActualizadas();
 }
 
-ListaEnlazadaNoOrdenada* EstructurasController::buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL)
+ListaGenerica<Product*>* EstructurasController::buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL)
 {
-    // Creamos una nueva lista para guardar los resultados de esta búsqueda
-    // OJO: El que llame a esta función debe encargarse de borrar la lista después
-    ListaEnlazadaNoOrdenada* resultados = new ListaEnlazadaNoOrdenada();
+    // Creamos una nueva lista genérica para los resultados
+    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
 
     // Unordered List Search
     if (unorderedList) {
@@ -189,9 +188,9 @@ ListaEnlazadaNoOrdenada* EstructurasController::buscarPorNombre(const std::strin
         tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
-    // Ordered List Search (separate timing, temporary results)
+    // Ordered List Search
     if (listaOrdenada) {
-        ListaEnlazadaNoOrdenada temp;
+        ListaGenerica<Product*> temp;
         auto start = std::chrono::high_resolution_clock::now();
         listaOrdenada->buscarPorNombre(nombre, &temp);
         auto end = std::chrono::high_resolution_clock::now();
@@ -200,7 +199,7 @@ ListaEnlazadaNoOrdenada* EstructurasController::buscarPorNombre(const std::strin
 
     // AVL Tree Search
     if (arbolAVL) {
-        ListaEnlazadaNoOrdenada temp;
+        ListaGenerica<Product*> temp;
         auto start = std::chrono::high_resolution_clock::now();
         arbolAVL->buscarPorNombreLista(nombre, &temp);
         auto end = std::chrono::high_resolution_clock::now();

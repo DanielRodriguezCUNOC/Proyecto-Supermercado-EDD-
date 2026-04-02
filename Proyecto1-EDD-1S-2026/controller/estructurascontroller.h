@@ -42,7 +42,7 @@ public slots:
                          bool emitirSenal = true);
     void actualizarVistas();
     void eliminarProducto(std::string barcode);
-    ListaEnlazadaNoOrdenada* buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL);
+    ListaGenerica<Product*>* buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL);
 signals:
     void etructurasActualizadas();
     void tiemposCalculados(long ul, long ol, long b, long bp, long avl);

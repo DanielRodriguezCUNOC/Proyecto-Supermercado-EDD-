@@ -36,7 +36,7 @@ public slots:
     void buscarPorNombre(const QString& nombre);
 
 signals:
-    void resultadosBusquedaNombre(ListaEnlazadaNoOrdenada* resultados, long tUL, long tOL, long tAVL);
+    void resultadosBusquedaNombre(ListaGenerica<Product*>* resultados, long tUL, long tOL, long tAVL);
 };
 
 #endif // APPCONTROLLER_H

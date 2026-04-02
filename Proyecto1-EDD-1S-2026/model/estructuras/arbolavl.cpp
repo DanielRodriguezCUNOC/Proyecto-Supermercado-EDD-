@@ -285,15 +285,15 @@ std::string ArbolAVL::generarDOT() const {
     return ss.str();
 }
 
-void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) {
+void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaGenerica<Product*>* resultados) {
     if (!nodo) return;
     
     if (nodo->producto.getName() == nombre) {
-        // Creamos una copia del producto para la lista de resultados
+        // Creamos una copia del producto para el resultado
         Product* p = new Product(nodo->producto);
         resultados->insertar(p);
         
-        // Seguimos buscando en ambos lados por si hay duplicados
+        // Seguimos buscando
         buscarPorNombreRec(nodo->izq, nombre, resultados);
         buscarPorNombreRec(nodo->der, nombre, resultados);
     } else if (nombre < nodo->producto.getName()) {
@@ -303,6 +303,6 @@ void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaEnlazadaN
     }
 }
 
-void ArbolAVL::buscarPorNombreLista(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const {
+void ArbolAVL::buscarPorNombreLista(const std::string& nombre, ListaGenerica<Product*>* resultados) const {
     buscarPorNombreRec(raiz, nombre, resultados);
 }
