@@ -30,6 +30,9 @@ public:
 
     void setAppController(AppController *controller) { appController = controller; }
     
+public slots:
+    void actualizarTiempos(long ul, long ol, long b, long bp, long avl);
+
     // Getters para acceder a las QGraphicsViews desde ViewController
     QGraphicsView* getViewListaNoOrdenada();
     QGraphicsView* getViewListaOrdenada();

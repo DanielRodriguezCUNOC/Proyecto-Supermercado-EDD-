@@ -44,6 +44,7 @@ public slots:
     void eliminarProducto(std::string barcode);
 signals:
     void etructurasActualizadas();
+    void tiemposCalculados(long ul, long ol, long b, long bp, long avl);
 };
 
 #endif // ESTRUCTURASCONTROLLER_H

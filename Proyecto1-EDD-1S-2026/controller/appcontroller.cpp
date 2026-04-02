@@ -31,6 +31,10 @@ AppController::AppController(QObject *parent) : QObject(parent)
     // Conectar actualización de estructuras con viewController para renderizar
     connect(estructurasController, &EstructurasController::etructurasActualizadas,
             viewController, &ViewController::actualizarVista);
+
+    // Conectar tiempos calculados con la vista principal
+    connect(estructurasController, &EstructurasController::tiemposCalculados,
+            vistaSistema, &PantallaSistema::actualizarTiempos);
 }
 
 AppController::~AppController()
@@ -66,6 +70,11 @@ void AppController::agregarProducto(const QString &nombre, const QString &codigo
         marca.toStdString(),
         precio,
         stock);
+}
+
+void AppController::eliminarProducto(const QString &barcode)
+{
+    estructurasController->eliminarProducto(barcode.toStdString());
 }
 
 void AppController::cargarArchivoCSV(const QString &ruta)

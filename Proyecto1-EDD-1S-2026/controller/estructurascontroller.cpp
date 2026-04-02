@@ -1,5 +1,6 @@
 #include "controller/estructurascontroller.h"
 #include <QDebug>
+#include <chrono>
 
 EstructurasController::EstructurasController()
 {
@@ -36,41 +37,72 @@ void EstructurasController::agregarProducto(std::string name,
 {
   Product producto(name, barcode, category, expiry_date, brand, price, stock);
 
-  // Cada lista recibe su propia copia dinámica para evitar aliasing y fugas en rutas nulas.
+  qDebug() << "--- Midiendo tiempos de inserción para:" << QString::fromStdString(name) << "---";
+
+  long tUL = 0, tOL = 0, tAVL = 0, tB = 0, tBP = 0;
+
+  // Lista No Ordenada
   if (unorderedList)
   {
-    Product *productoNoOrdenado = new Product(producto);
-    unorderedList->insertar(productoNoOrdenado);
+    auto start = std::chrono::high_resolution_clock::now();
+    Product *p = new Product(producto);
+    unorderedList->insertar(p);
+    auto end = std::chrono::high_resolution_clock::now();
+    tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Lista No Ordenada]:" << tUL << "µs";
   }
 
+  // Lista Ordenada
   if (listaOrdenada)
   {
-    Product *productoOrdenado = new Product(producto);
-    listaOrdenada->insertar(productoOrdenado);
+    auto start = std::chrono::high_resolution_clock::now();
+    Product *p = new Product(producto);
+    listaOrdenada->insertar(p);
+    auto end = std::chrono::high_resolution_clock::now();
+    tOL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Lista Ordenada]:" << tOL << "µs";
   }
 
+  // Arbol AVL
   if (arbolAVL)
   {
+    auto start = std::chrono::high_resolution_clock::now();
     arbolAVL->insertar(producto);
+    auto end = std::chrono::high_resolution_clock::now();
+    tAVL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Arbol AVL]:" << tAVL << "µs";
   }
 
+  // Arbol B
   if (arbolB)
   {
+    auto start = std::chrono::high_resolution_clock::now();
     arbolB->insertar(producto);
+    auto end = std::chrono::high_resolution_clock::now();
+    tB = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Arbol B]:" << tB << "µs";
   }
 
+  // Arbol B+
   if (arbolBPlus)
   {
+    auto start = std::chrono::high_resolution_clock::now();
     std::string errorRollback;
     bool insercionExitosa = arbolBPlus->insertarProducto(producto, errorRollback);
-    if (!insercionExitosa)
-    {
-      qDebug() << "Error al insertar en ArbolBPlus:" << QString::fromStdString(errorRollback);
+    auto end = std::chrono::high_resolution_clock::now();
+    tBP = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    
+    if (!insercionExitosa) {
+      qDebug() << "[Arbol B+]: ERROR -" << QString::fromStdString(errorRollback);
+    } else {
+      qDebug() << "[Arbol B+]:" << tBP << "µs";
     }
   }
 
-  // Emitir señal para notificar que las estructuras fueron actualizadas si emitirSenal es true
+  qDebug() << "---------------------------------------------------------";
+
   if (emitirSenal) {
+      emit tiemposCalculados(tUL, tOL, tB, tBP, tAVL);
       emit etructurasActualizadas();
   }
 }
@@ -82,4 +114,63 @@ void EstructurasController::actualizarVistas()
 
 void EstructurasController::eliminarProducto(std::string barcode)
 {
+  qDebug() << "--- Midiendo tiempos de eliminación para:" << QString::fromStdString(barcode) << "---";
+
+  long tUL = 0, tOL = 0, tAVL = 0, tB = 0, tBP = 0;
+
+  if (unorderedList)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    unorderedList->eliminar(barcode);
+    auto end = std::chrono::high_resolution_clock::now();
+    tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Lista No Ordenada]:" << tUL << "µs";
+  }
+
+  if (listaOrdenada)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    listaOrdenada->eliminar(barcode);
+    auto end = std::chrono::high_resolution_clock::now();
+    tOL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Lista Ordenada]:" << tOL << "µs";
+  }
+
+  if (arbolAVL)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    arbolAVL->eliminar(barcode);
+    auto end = std::chrono::high_resolution_clock::now();
+    tAVL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Arbol AVL]:" << tAVL << "µs";
+  }
+
+  if (arbolB)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    arbolB->eliminarPorCodigo(barcode);
+    auto end = std::chrono::high_resolution_clock::now();
+    tB = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    qDebug() << "[Arbol B]:" << tB << "µs";
+  }
+
+  if (arbolBPlus)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    std::string error;
+    bool exito = arbolBPlus->eliminarProducto(barcode, error);
+    auto end = std::chrono::high_resolution_clock::now();
+    tBP = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    
+    if (!exito) {
+      qDebug() << "[Arbol B+]: ERROR -" << QString::fromStdString(error);
+    } else {
+      qDebug() << "[Arbol B+]:" << tBP << "µs";
+    }
+  }
+
+  qDebug() << "---------------------------------------------------------";
+
+  emit tiemposCalculados(tUL, tOL, tB, tBP, tAVL);
+  emit etructurasActualizadas();
 }

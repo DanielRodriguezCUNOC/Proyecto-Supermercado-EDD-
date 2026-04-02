@@ -234,6 +234,8 @@ void PantallaSistema::inicializarPantallas()
     {
         connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
                 appController, &AppController::agregarProducto);
+        connect(eliminarProducto, &PantallaEliminar::productoEliminado,
+                appController, &AppController::eliminarProducto);
     }
 
     // Conectar botones a los cambios de pantalla
@@ -302,4 +304,14 @@ QGraphicsView *PantallaSistema::getViewArbolAVL()
     return ui ? ui->gvArbolAVL : nullptr;
     // Si da clavos descomentar esta línea y comentar la de arriba, es un parche temporal para evitar que se caiga la aplicación al no tener implementada la vista del AVL
     // return nullptr;
+}
+
+void PantallaSistema::actualizarTiempos(long ul, long ol, long b, long bp, long avl)
+{
+    if (!ui) return;
+    ui->lblTiempoUL->setText(QString("Tiempo: %1 µs").arg(ul));
+    ui->lblTiempoOL->setText(QString("Tiempo: %1 µs").arg(ol));
+    ui->lblTiempoB->setText(QString("Tiempo: %1 µs").arg(b));
+    ui->lblTiempoBPlus->setText(QString("Tiempo: %1 µs").arg(bp));
+    ui->lblTiempoAVL->setText(QString("Tiempo: %1 µs").arg(avl));
 }
