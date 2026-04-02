@@ -197,36 +197,44 @@ void EstructurasController::eliminarProducto(std::string barcode)
 
 ListaGenerica<Product*>* EstructurasController::buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL)
 {
-    // Creamos una nueva lista genérica para los resultados
-    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
-
-    // Unordered List Search
+    tUL = 0; tOL = 0; tAVL = 0;
+    
+    // 1. Unordered List Search (Only for timing)
     if (unorderedList) {
+        ListaGenerica<Product*> placeholder;
         auto start = std::chrono::high_resolution_clock::now();
-        unorderedList->buscarPorNombre(nombre, resultados);
+        unorderedList->buscarPorNombre(nombre, &placeholder);
         auto end = std::chrono::high_resolution_clock::now();
         tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        
+        // Cleanup copies in placeholder
+        NodoGenerico<Product*>* aux = placeholder.getCabeza();
+        while(aux) { delete aux->valor; aux = aux->siguiente; }
     }
 
-    // Ordered List Search
+    // 2. Ordered List Search (Only for timing)
     if (listaOrdenada) {
-        ListaGenerica<Product*> temp;
+        ListaGenerica<Product*> placeholder;
         auto start = std::chrono::high_resolution_clock::now();
-        listaOrdenada->buscarPorNombre(nombre, &temp);
+        listaOrdenada->buscarPorNombre(nombre, &placeholder);
         auto end = std::chrono::high_resolution_clock::now();
         tOL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        
+        // Cleanup
+        NodoGenerico<Product*>* aux = placeholder.getCabeza();
+        while(aux) { delete aux->valor; aux = aux->siguiente; }
     }
 
-    // AVL Tree Search
+    // 3. AVL Tree Search (Actual results sorted alphabetically)
+    ListaGenerica<Product*>* resultadosAVL = new ListaGenerica<Product*>();
     if (arbolAVL) {
-        ListaGenerica<Product*> temp;
         auto start = std::chrono::high_resolution_clock::now();
-        arbolAVL->buscarPorNombreLista(nombre, &temp);
+        arbolAVL->buscarPorNombreLista(nombre, resultadosAVL);
         auto end = std::chrono::high_resolution_clock::now();
         tAVL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
-    return resultados;
+    return resultadosAVL;
 }
 
 ListaGenerica<Product*>* EstructurasController::buscarPorCategoria(const std::string& categoria, long& tiempo)

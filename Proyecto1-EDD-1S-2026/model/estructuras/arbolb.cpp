@@ -277,26 +277,6 @@ void NodoB::dividirHijo(int i, NodoB *y)
     n++;
 }
 
-void NodoB::buscarPorCaducidadRec(const std::string &desde, const std::string &hasta, ListaResultados* resultados)
-{
-    int i = 0;
-    
-    // Descartar todas las porciones lógicas previas a la cota inicial provista
-    while (i < n && claves[i].getExpiryDate() < desde)
-        i++;
-        
-    // Recolectar resultados dentro de la franja y propagar las llamadas a los descendientes
-    for (; i < n && claves[i].getExpiryDate() <= hasta; i++) {
-        if (!hoja) hijos[i]->buscarPorCaducidadRec(desde, hasta, resultados);
-        resultados->agregar(claves[i]);
-    }
-    
-    // busqueda en el hijo situado ulteriormente, para las ramas superiores al final del rango si aplica
-    if (!hoja) {
-        hijos[i]->buscarPorCaducidadRec(desde, hasta, resultados);
-    }
-}
-
 // =========================================================================
 // Implementación de ArbolB
 // =========================================================================

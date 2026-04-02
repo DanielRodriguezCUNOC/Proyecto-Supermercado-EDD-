@@ -285,22 +285,18 @@ std::string ArbolAVL::generarDOT() const {
     return ss.str();
 }
 
-void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaGenerica<Product*>* resultados) {
-    if (!nodo) return;
-    
+void ArbolAVL::buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaGenerica<Product*>* resultados) const {
+    if (nodo == nullptr) return;
+
+    // Recorrido In-Order para mantener el orden alfabético
+    buscarPorNombreRec(nodo->izq, nombre, resultados);
+
     if (nodo->producto.getName() == nombre) {
         // Creamos una copia del producto para el resultado
-        Product* p = new Product(nodo->producto);
-        resultados->insertar(p);
-        
-        // Seguimos buscando
-        buscarPorNombreRec(nodo->izq, nombre, resultados);
-        buscarPorNombreRec(nodo->der, nombre, resultados);
-    } else if (nombre < nodo->producto.getName()) {
-        buscarPorNombreRec(nodo->izq, nombre, resultados);
-    } else {
-        buscarPorNombreRec(nodo->der, nombre, resultados);
+        resultados->insertar(new Product(nodo->producto));
     }
+
+    buscarPorNombreRec(nodo->der, nombre, resultados);
 }
 
 void ArbolAVL::buscarPorNombreLista(const std::string& nombre, ListaGenerica<Product*>* resultados) const {

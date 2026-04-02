@@ -280,6 +280,8 @@ void PantallaSistema::conectarPantallasConController()
 
     PantallaEliminar *eliminarProducto = findChild<PantallaEliminar *>();
     PantallaBuscarPorNombre *buscarNombre = findChild<PantallaBuscarPorNombre *>();
+    PantallaBuscarPorCategoria *buscarCategoria = findChild<PantallaBuscarPorCategoria *>();
+    PantallaBuscarPorRangoCaducidad *buscarRango = findChild<PantallaBuscarPorRangoCaducidad *>();
 
     if (agregarProducto)
     {
@@ -303,9 +305,13 @@ void PantallaSistema::conectarPantallasConController()
         connect(appController, &AppController::resultadosBusquedaNombre,
                 buscarNombre, &PantallaBuscarPorNombre::mostrarResultados,
                 Qt::UniqueConnection);
+        // Connect name search times to system labels
+        connect(appController, &AppController::resultadosBusquedaNombre,
+                [this](ListaGenerica<Product*>* r, long ul, long ol, long avl) {
+                    this->actualizarTiempos(ul, ol, -1, -1, avl);
+                });
     }
 
-    PantallaBuscarPorCategoria *buscarCategoria = findChild<PantallaBuscarPorCategoria *>();
     if (buscarCategoria)
     {
         connect(buscarCategoria, &PantallaBuscarPorCategoria::buscarSolicitado,
@@ -314,9 +320,13 @@ void PantallaSistema::conectarPantallasConController()
         connect(appController, &AppController::resultadosBusquedaCategoria,
                 buscarCategoria, &PantallaBuscarPorCategoria::mostrarResultados,
                 Qt::UniqueConnection);
+        // Connect category search time (B+)
+        connect(appController, &AppController::resultadosBusquedaCategoria,
+                [this](ListaGenerica<Product*>* r, long t) {
+                    this->actualizarTiempos(-1, -1, -1, t, -1);
+                });
     }
 
-    PantallaBuscarPorRangoCaducidad *buscarRango = findChild<PantallaBuscarPorRangoCaducidad *>();
     if (buscarRango)
     {
         connect(buscarRango, &PantallaBuscarPorRangoCaducidad::buscarSolicitado,
@@ -325,6 +335,11 @@ void PantallaSistema::conectarPantallasConController()
         connect(appController, &AppController::resultadosBusquedaRango,
                 buscarRango, &PantallaBuscarPorRangoCaducidad::mostrarResultados,
                 Qt::UniqueConnection);
+        // Connect range search time (B)
+        connect(appController, &AppController::resultadosBusquedaRango,
+                [this](ListaGenerica<Product*>* r, long t) {
+                    this->actualizarTiempos(-1, -1, t, -1, -1);
+                });
     }
 }
 
@@ -366,9 +381,9 @@ QGraphicsView *PantallaSistema::getViewArbolAVL()
 void PantallaSistema::actualizarTiempos(long ul, long ol, long b, long bp, long avl)
 {
     if (!ui) return;
-    ui->lblTiempoUL->setText(QString("Tiempo: %1 µs").arg(ul));
-    ui->lblTiempoOL->setText(QString("Tiempo: %1 µs").arg(ol));
-    ui->lblTiempoB->setText(QString("Tiempo: %1 µs").arg(b));
-    ui->lblTiempoBPlus->setText(QString("Tiempo: %1 µs").arg(bp));
-    ui->lblTiempoAVL->setText(QString("Tiempo: %1 µs").arg(avl));
+    if (ul != -1) ui->lblTiempoUL->setText(QString("Tiempo: %1 µs").arg(ul));
+    if (ol != -1) ui->lblTiempoOL->setText(QString("Tiempo: %1 µs").arg(ol));
+    if (b != -1) ui->lblTiempoB->setText(QString("Tiempo: %1 µs").arg(b));
+    if (bp != -1) ui->lblTiempoBPlus->setText(QString("Tiempo: %1 µs").arg(bp));
+    if (avl != -1) ui->lblTiempoAVL->setText(QString("Tiempo: %1 µs").arg(avl));
 }

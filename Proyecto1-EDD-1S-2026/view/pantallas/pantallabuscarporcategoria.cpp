@@ -42,14 +42,12 @@ void PantallaBuscarPorCategoria::limpiarResultados()
             delete item;
         }
     }
-    ui->lblSearchBPlus->setText("");
+    ui->lineEdit->setText("");
 }
 
 void PantallaBuscarPorCategoria::mostrarResultados(ListaGenerica<Product*>* resultados, long tiempo)
 {
     if (!resultados) return;
-
-    ui->lblSearchBPlus->setText(QString("%1 µs").arg(tiempo));
 
     QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(ui->scrollAreaWidgetContents->layout());
     if (!layout) return;

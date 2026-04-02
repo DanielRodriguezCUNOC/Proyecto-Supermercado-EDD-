@@ -1,3 +1,6 @@
+#ifndef PANTALLABUSCARPORRANGOCADUCIDAD_H
+#define PANTALLABUSCARPORRANGOCADUCIDAD_H
+
 #include <QWidget>
 #include "model/entidades/product.h"
 #include "model/estructuras/listagenerica.h"
@@ -27,3 +30,5 @@ private slots:
 private:
     Ui::PantallaBuscarPorRangoCaducidad *ui;
 };
+
+#endif // PANTALLABUSCARPORRANGOCADUCIDAD_H

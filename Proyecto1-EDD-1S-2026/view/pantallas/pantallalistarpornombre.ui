@@ -50,7 +50,7 @@
         <string>Ingrese Nombre:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="leNombre">
        <property name="geometry">
         <rect>
          <x>220</x>

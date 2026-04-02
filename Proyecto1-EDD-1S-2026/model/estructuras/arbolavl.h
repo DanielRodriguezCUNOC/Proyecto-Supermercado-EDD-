@@ -37,6 +37,7 @@ private:
     
     NodoAVL* buscarRec(NodoAVL* root, const std::string& nombre) const;
     void inOrderRec(NodoAVL* root) const;
+    void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaGenerica<Product*>* resultados) const;
     void destruirRec(NodoAVL* nodo);         // Limpia la memoria cuando ya no usamos el árbol
 
 public:
