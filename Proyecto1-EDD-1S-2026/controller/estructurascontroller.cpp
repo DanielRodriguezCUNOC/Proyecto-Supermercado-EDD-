@@ -243,3 +243,18 @@ ListaGenerica<Product*>* EstructurasController::buscarPorCategoria(const std::st
 
     return resultados;
 }
+
+ListaGenerica<Product*>* EstructurasController::buscarPorRangoCaducidad(const std::string& inicio, const std::string& fin, long& tiempo)
+{
+    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
+    tiempo = 0;
+
+    if (arbolB) {
+        auto start = std::chrono::high_resolution_clock::now();
+        arbolB->buscarPorRangoFecha(inicio, fin, resultados);
+        auto end = std::chrono::high_resolution_clock::now();
+        tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+
+    return resultados;
+}

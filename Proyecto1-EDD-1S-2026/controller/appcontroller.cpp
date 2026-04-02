@@ -119,3 +119,11 @@ void AppController::buscarPorCategoria(const QString& categoria)
     ListaGenerica<Product*>* resultados = estructurasController->buscarPorCategoria(categoria.toStdString(), tiempo);
     emit resultadosBusquedaCategoria(resultados, tiempo);
 }
+
+void AppController::buscarPorRangoCaducidad(const QString& inicio, const QString& fin)
+{
+    long tiempo = 0;
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorRangoCaducidad(
+        inicio.toStdString(), fin.toStdString(), tiempo);
+    emit resultadosBusquedaRango(resultados, tiempo);
+}

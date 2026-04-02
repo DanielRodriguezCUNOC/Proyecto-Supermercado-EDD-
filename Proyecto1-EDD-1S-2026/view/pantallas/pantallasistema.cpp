@@ -315,6 +315,17 @@ void PantallaSistema::conectarPantallasConController()
                 buscarCategoria, &PantallaBuscarPorCategoria::mostrarResultados,
                 Qt::UniqueConnection);
     }
+
+    PantallaBuscarPorRangoCaducidad *buscarRango = findChild<PantallaBuscarPorRangoCaducidad *>();
+    if (buscarRango)
+    {
+        connect(buscarRango, &PantallaBuscarPorRangoCaducidad::buscarSolicitado,
+                appController, &AppController::buscarPorRangoCaducidad,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaRango,
+                buscarRango, &PantallaBuscarPorRangoCaducidad::mostrarResultados,
+                Qt::UniqueConnection);
+    }
 }
 
 void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)

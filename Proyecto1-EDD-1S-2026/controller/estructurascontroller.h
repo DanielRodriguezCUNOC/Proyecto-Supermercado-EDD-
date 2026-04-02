@@ -51,6 +51,7 @@ public slots:
     void eliminarProducto(std::string barcode);
     ListaGenerica<Product*>* buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL);
     ListaGenerica<Product*>* buscarPorCategoria(const std::string& categoria, long& tiempo);
+    ListaGenerica<Product*>* buscarPorRangoCaducidad(const std::string& inicio, const std::string& fin, long& tiempo);
 signals:
     void etructurasActualizadas();
     void tiemposCalculados(long ul, long ol, long b, long bp, long avl);

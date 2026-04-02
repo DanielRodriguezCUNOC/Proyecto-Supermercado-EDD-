@@ -53,7 +53,7 @@
         <string>Ingrese rango:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="leInicio">
        <property name="geometry">
         <rect>
          <x>190</x>
@@ -79,7 +79,7 @@
         <string>Buscar</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="leFinal">
        <property name="geometry">
         <rect>
          <x>430</x>

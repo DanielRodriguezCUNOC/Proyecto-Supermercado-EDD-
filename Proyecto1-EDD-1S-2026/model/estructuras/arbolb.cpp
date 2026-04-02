@@ -375,14 +375,38 @@ void ArbolB::imprimir()
     cout << endl;
 }
 
-ListaResultados* ArbolB::buscarPorCaducidad(const std::string &desde, const std::string &hasta)
+void NodoB::buscarPorRangoFechaRec(const std::string &inicio, const std::string &fin, ListaGenerica<Product*>* resultados)
 {
-    ListaResultados* resultados = new ListaResultados();
-    if (raiz) {
-        // Proceso de busqueda
-        raiz->buscarPorCaducidadRec(desde, hasta, resultados);
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        // Recursión a la izquierda de la clave i
+        if (!hoja) hijos[i]->buscarPorRangoFechaRec(inicio, fin, resultados);
+        
+        // Verificar si la clave i está en el rango
+        // Comparamos por fecha de expiración
+        if (claves[i].getExpiryDate() >= inicio && claves[i].getExpiryDate() <= fin)
+        {
+            // Insertamos una copia del producto
+            resultados->insertar(new Product(claves[i]));
+        }
+        else if (claves[i].getExpiryDate() > fin)
+        {
+            // Como las claves están ordenadas por fecha, si ya nos pasamos de 'fin',
+            // no hay necesidad de procesar más claves ni el hijo derecho de esta clave.
+            return;
+        }
     }
-    return resultados;
+    
+    // Al finalizar con las claves, se recorre el último subárbol si no nos pasamos del rango
+    if (!hoja) hijos[i]->buscarPorRangoFechaRec(inicio, fin, resultados);
+}
+
+void ArbolB::buscarPorRangoFecha(const std::string &inicio, const std::string &fin, ListaGenerica<Product*>* resultados)
+{
+    if (raiz && resultados) {
+        raiz->buscarPorRangoFechaRec(inicio, fin, resultados);
+    }
 }
 
 // =========================================================================

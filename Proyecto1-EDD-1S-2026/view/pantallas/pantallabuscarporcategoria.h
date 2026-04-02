@@ -1,3 +1,6 @@
+#ifndef PANTALLABUSCARPORCATEGORIA_H
+#define PANTALLABUSCARPORCATEGORIA_H
+
 #include <QWidget>
 #include "model/entidades/product.h"
 #include "model/estructuras/listagenerica.h"
@@ -27,3 +30,5 @@ private slots:
 private:
     Ui::PantallaBuscarPorCategoria *ui;
 };
+
+#endif // PANTALLABUSCARPORCATEGORIA_H

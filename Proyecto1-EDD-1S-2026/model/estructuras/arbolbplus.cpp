@@ -234,7 +234,7 @@ void ArbolBPlus::buscarPorCategoriaLista(const std::string &categoria, ListaGene
         bool encontrada = false;
         for (int i = 0; i < actual->numClaves; ++i) {
             if (actual->claves[i] == categoria) {
-                // Encontrada! Recolectamos todos los productos de esta lista
+                // Recolectamos todos los productos de esta lista
                 Nodo *lista = actual->productos[i];
                 while (lista) {
                     // Creamos una copia del producto para el resultado
