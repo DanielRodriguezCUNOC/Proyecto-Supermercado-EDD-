@@ -50,6 +50,9 @@ public:
     
     // Muestra todos los productos ordenados alfabéticamente
     void listarPorNombre() const;
+    
+    // Busca todos los productos que coincidan con un nombre
+    void buscarPorNombreLista(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const;
 
     // Genera el código para dibujar el árbol con Graphviz
     std::string generarDOT() const;

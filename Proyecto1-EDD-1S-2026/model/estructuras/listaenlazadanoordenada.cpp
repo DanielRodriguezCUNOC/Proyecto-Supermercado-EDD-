@@ -137,3 +137,14 @@ std::string ListaEnlazadaNoOrdenada::generarDOT() const {
     ss << "}\n";
     return ss.str();
 }
+
+void ListaEnlazadaNoOrdenada::buscarPorNombre(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const {
+    Nodo* actual = cabeza;
+    while (actual) {
+        if (actual->getValue()->getName() == nombre) {
+            Product* p = new Product(*(actual->getValue()));
+            resultados->insertar(p);
+        }
+        actual = actual->getNext();
+    }
+}

@@ -174,3 +174,38 @@ void EstructurasController::eliminarProducto(std::string barcode)
   emit tiemposCalculados(tUL, tOL, tB, tBP, tAVL);
   emit etructurasActualizadas();
 }
+
+ListaEnlazadaNoOrdenada* EstructurasController::buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL)
+{
+    // Creamos una nueva lista para guardar los resultados de esta búsqueda
+    // OJO: El que llame a esta función debe encargarse de borrar la lista después
+    ListaEnlazadaNoOrdenada* resultados = new ListaEnlazadaNoOrdenada();
+
+    // Unordered List Search
+    if (unorderedList) {
+        auto start = std::chrono::high_resolution_clock::now();
+        unorderedList->buscarPorNombre(nombre, resultados);
+        auto end = std::chrono::high_resolution_clock::now();
+        tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+
+    // Ordered List Search (separate timing, temporary results)
+    if (listaOrdenada) {
+        ListaEnlazadaNoOrdenada temp;
+        auto start = std::chrono::high_resolution_clock::now();
+        listaOrdenada->buscarPorNombre(nombre, &temp);
+        auto end = std::chrono::high_resolution_clock::now();
+        tOL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+
+    // AVL Tree Search
+    if (arbolAVL) {
+        ListaEnlazadaNoOrdenada temp;
+        auto start = std::chrono::high_resolution_clock::now();
+        arbolAVL->buscarPorNombreLista(nombre, &temp);
+        auto end = std::chrono::high_resolution_clock::now();
+        tAVL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+
+    return resultados;
+}

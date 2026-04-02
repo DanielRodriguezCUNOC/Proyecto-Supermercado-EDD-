@@ -284,3 +284,25 @@ std::string ArbolAVL::generarDOT() const {
     ss << "}\n";
     return ss.str();
 }
+
+void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) {
+    if (!nodo) return;
+    
+    if (nodo->producto.getName() == nombre) {
+        // Creamos una copia del producto para la lista de resultados
+        Product* p = new Product(nodo->producto);
+        resultados->insertar(p);
+        
+        // Seguimos buscando en ambos lados por si hay duplicados
+        buscarPorNombreRec(nodo->izq, nombre, resultados);
+        buscarPorNombreRec(nodo->der, nombre, resultados);
+    } else if (nombre < nodo->producto.getName()) {
+        buscarPorNombreRec(nodo->izq, nombre, resultados);
+    } else {
+        buscarPorNombreRec(nodo->der, nombre, resultados);
+    }
+}
+
+void ArbolAVL::buscarPorNombreLista(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const {
+    buscarPorNombreRec(raiz, nombre, resultados);
+}

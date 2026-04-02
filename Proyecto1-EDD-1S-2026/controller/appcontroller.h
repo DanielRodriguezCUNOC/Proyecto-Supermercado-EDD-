@@ -33,6 +33,10 @@ public slots:
                          const QDate& fechaCaducidad, const QString& marca, double precio, int stock);
     void eliminarProducto(const QString& barcode);
     void cargarArchivoCSV(const QString &ruta);
+    void buscarPorNombre(const QString& nombre);
+
+signals:
+    void resultadosBusquedaNombre(ListaEnlazadaNoOrdenada* resultados, long tUL, long tOL, long tAVL);
 };
 
 #endif // APPCONTROLLER_H

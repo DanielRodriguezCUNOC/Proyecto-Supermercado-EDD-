@@ -236,6 +236,11 @@ void PantallaSistema::inicializarPantallas()
                 appController, &AppController::agregarProducto);
         connect(eliminarProducto, &PantallaEliminar::productoEliminado,
                 appController, &AppController::eliminarProducto);
+        
+        connect(buscarPorNombre, &PantallaBuscarPorNombre::buscarSolicitado,
+                appController, &AppController::buscarPorNombre);
+        connect(appController, &AppController::resultadosBusquedaNombre,
+                buscarPorNombre, &PantallaBuscarPorNombre::mostrarResultados);
     }
 
     // Conectar botones a los cambios de pantalla

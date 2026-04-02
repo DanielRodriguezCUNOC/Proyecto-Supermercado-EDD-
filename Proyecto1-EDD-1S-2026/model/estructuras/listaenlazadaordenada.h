@@ -30,6 +30,9 @@ public:
     
     // Para dibujar la lista con Graphviz
     std::string generarDOT() const;
+    
+    // Busca todos los productos con el mismo nombre
+    void buscarPorNombre(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const;
 };
 
 #endif // LISTAENLAZADAORDENADA_H

@@ -101,3 +101,11 @@ void AppController::cargarArchivoCSV(const QString &ruta)
     // Pasar los datos cargados a la tabla qlera
     vistaSistema->mostrarDatosCSV(productos);
 }
+
+void AppController::buscarPorNombre(const QString &nombre)
+{
+    long tUL = 0, tOL = 0, tAVL = 0;
+    ListaEnlazadaNoOrdenada* results = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
+    
+    emit resultadosBusquedaNombre(results, tUL, tOL, tAVL);
+}
