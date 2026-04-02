@@ -28,7 +28,7 @@ public:
     void inicializarPantallas();
     void mostrarDatosCSV(const QList<Product>& productos);
 
-    void setAppController(AppController *controller) { appController = controller; }
+    void setAppController(AppController *controller);
     
 public slots:
     void actualizarTiempos(long ul, long ol, long b, long bp, long avl);
@@ -41,6 +41,8 @@ public slots:
     QGraphicsView* getViewArbolAVL();
 
 private:
+    void conectarPantallasConController();
+
     Ui::PantallaSistema *ui;
     QGraphicsScene *scene1;
     QGraphicsScene *scene2;

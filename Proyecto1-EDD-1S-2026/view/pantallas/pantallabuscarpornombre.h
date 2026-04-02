@@ -2,6 +2,8 @@
 #define PANTALLABUSCARPORNOMBRE_H
 
 #include <QWidget>
+#include "entidades/product.h"
+#include "estructuras/listagenerica.h"
 
 namespace Ui {
 class PantallaBuscarPorNombre;

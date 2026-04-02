@@ -27,6 +27,7 @@ public:
     
     // Saca un producto de la fila
     void eliminar(Product *product);
+    void eliminarPorCodigo(const std::string& barcode);
     
     // Devuelve cuántos hay
     int getSize() const;

@@ -185,6 +185,12 @@ PantallaSistema::~PantallaSistema()
     delete ui;
 }
 
+void PantallaSistema::setAppController(AppController *controller)
+{
+    appController = controller;
+    conectarPantallasConController();
+}
+
 void PantallaSistema::actualizarReloj()
 {
     QTime hora = QTime::currentTime();
@@ -229,19 +235,8 @@ void PantallaSistema::inicializarPantallas()
     ui->stackedWidget->addWidget(buscarRango);
     ui->stackedWidget->addWidget(listarNombre);
 
-    // Conectar al controlador principal
-    if (appController)
-    {
-        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
-                appController, &AppController::agregarProducto);
-        connect(eliminarProducto, &PantallaEliminar::productoEliminado,
-                appController, &AppController::eliminarProducto);
-        
-        connect(buscarPorNombre, &PantallaBuscarPorNombre::buscarSolicitado,
-                appController, &AppController::buscarPorNombre);
-        connect(appController, &AppController::resultadosBusquedaNombre,
-                buscarPorNombre, &PantallaBuscarPorNombre::mostrarResultados);
-    }
+        // Intenta conectar inmediatamente; si el controller aun no existe, se conecta al llamar setAppController().
+        conectarPantallasConController();
 
     // Conectar botones a los cambios de pantalla
 
@@ -274,6 +269,41 @@ void PantallaSistema::inicializarPantallas()
 
     // Pantalla inicial visible
     ui->stackedWidget->setCurrentWidget(mostrarCSV);
+}
+
+void PantallaSistema::conectarPantallasConController()
+{
+    if (!appController)
+    {
+        return;
+    }
+
+    PantallaEliminar *eliminarProducto = findChild<PantallaEliminar *>();
+    PantallaBuscarPorNombre *buscarNombre = findChild<PantallaBuscarPorNombre *>();
+
+    if (agregarProducto)
+    {
+        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
+                appController, &AppController::agregarProducto,
+                Qt::UniqueConnection);
+    }
+
+    if (eliminarProducto)
+    {
+        connect(eliminarProducto, &PantallaEliminar::productoEliminado,
+                appController, &AppController::eliminarProducto,
+                Qt::UniqueConnection);
+    }
+
+    if (buscarNombre)
+    {
+        connect(buscarNombre, &PantallaBuscarPorNombre::buscarSolicitado,
+                appController, &AppController::buscarPorNombre,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaNombre,
+                buscarNombre, &PantallaBuscarPorNombre::mostrarResultados,
+                Qt::UniqueConnection);
+    }
 }
 
 void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)

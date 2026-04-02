@@ -104,6 +104,12 @@ void EstructurasController::agregarProducto(std::string name,
   if (emitirSenal) {
       emit tiemposCalculados(tUL, tOL, tB, tBP, tAVL);
       emit etructurasActualizadas();
+    } else {
+      acumuladoUL += tUL;
+      acumuladoOL += tOL;
+      acumuladoB += tB;
+      acumuladoBPlus += tBP;
+      acumuladoAVL += tAVL;
   }
 }
 
@@ -111,6 +117,20 @@ void EstructurasController::actualizarVistas()
 {
     emit etructurasActualizadas();
 }
+
+  void EstructurasController::reiniciarTiemposAcumulados()
+  {
+    acumuladoUL = 0;
+    acumuladoOL = 0;
+    acumuladoB = 0;
+    acumuladoBPlus = 0;
+    acumuladoAVL = 0;
+  }
+
+  void EstructurasController::emitirTiemposAcumulados()
+  {
+    emit tiemposCalculados(acumuladoUL, acumuladoOL, acumuladoB, acumuladoBPlus, acumuladoAVL);
+  }
 
 void EstructurasController::eliminarProducto(std::string barcode)
 {
@@ -121,7 +141,7 @@ void EstructurasController::eliminarProducto(std::string barcode)
   if (unorderedList)
   {
     auto start = std::chrono::high_resolution_clock::now();
-    unorderedList->eliminar(barcode);
+    unorderedList->eliminarPorCodigo(barcode);
     auto end = std::chrono::high_resolution_clock::now();
     tUL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     qDebug() << "[Lista No Ordenada]:" << tUL << "µs";
@@ -130,7 +150,7 @@ void EstructurasController::eliminarProducto(std::string barcode)
   if (listaOrdenada)
   {
     auto start = std::chrono::high_resolution_clock::now();
-    listaOrdenada->eliminar(barcode);
+    listaOrdenada->eliminarPorCodigo(barcode);
     auto end = std::chrono::high_resolution_clock::now();
     tOL = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     qDebug() << "[Lista Ordenada]:" << tOL << "µs";

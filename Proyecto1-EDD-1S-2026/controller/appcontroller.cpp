@@ -82,6 +82,8 @@ void AppController::cargarArchivoCSV(const QString &ruta)
     const QList<Product> productos = fileController->cargarCSV(ruta);
     qDebug() << "CSV cargado:" << ruta << "Productos válidos:" << productos.size();
 
+    estructurasController->reiniciarTiemposAcumulados();
+
     for (const Product &p : productos)
     {
         estructurasController->agregarProducto(
@@ -94,6 +96,8 @@ void AppController::cargarArchivoCSV(const QString &ruta)
             p.getStock(),
             false); // No emitir señal por cada producto
     }
+
+    estructurasController->emitirTiemposAcumulados();
     
     // Actualizar arboles de una sola vez XD
     estructurasController->actualizarVistas();

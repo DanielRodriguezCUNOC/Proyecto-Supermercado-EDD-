@@ -15,6 +15,11 @@ private:
     ArbolB *arbolB;
     ArbolBPlus *arbolBPlus;
     ArbolAVL *arbolAVL;
+    long acumuladoUL = 0;
+    long acumuladoOL = 0;
+    long acumuladoB = 0;
+    long acumuladoBPlus = 0;
+    long acumuladoAVL = 0;
 
 public:
     EstructurasController();
@@ -41,6 +46,8 @@ public slots:
                          int stock,
                          bool emitirSenal = true);
     void actualizarVistas();
+    void reiniciarTiemposAcumulados();
+    void emitirTiemposAcumulados();
     void eliminarProducto(std::string barcode);
     ListaGenerica<Product*>* buscarPorNombre(const std::string& nombre, long& tUL, long& tOL, long& tAVL);
 signals:

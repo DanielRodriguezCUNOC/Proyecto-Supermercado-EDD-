@@ -138,12 +138,22 @@ std::string ListaEnlazadaNoOrdenada::generarDOT() const {
     return ss.str();
 }
 
-void ListaEnlazadaNoOrdenada::buscarPorNombre(const std::string& nombre, ListaEnlazadaNoOrdenada* resultados) const {
+void ListaEnlazadaNoOrdenada::buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const {
     Nodo* actual = cabeza;
     while (actual) {
         if (actual->getValue()->getName() == nombre) {
             Product* p = new Product(*(actual->getValue()));
             resultados->insertar(p);
+        }
+        actual = actual->getNext();
+    }
+}
+void ListaEnlazadaNoOrdenada::eliminarPorCodigo(const std::string& barcode) {
+    Nodo* actual = cabeza;
+    while (actual) {
+        if (actual->getValue()->getBarcode() == barcode) {
+            eliminar(actual->getValue());
+            return;
         }
         actual = actual->getNext();
     }

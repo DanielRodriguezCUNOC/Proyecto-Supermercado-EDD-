@@ -156,3 +156,14 @@ void ListaEnlazadaOrdenada::buscarPorNombre(const std::string& nombre, ListaGene
         actual = actual->getNext();
     }
 }
+
+void ListaEnlazadaOrdenada::eliminarPorCodigo(const std::string& barcode) {
+    Nodo* actual = cabeza;
+    while (actual) {
+        if (actual->getValue()->getBarcode() == barcode) {
+            eliminar(actual->getValue());
+            return;
+        }
+        actual = actual->getNext();
+    }
+}

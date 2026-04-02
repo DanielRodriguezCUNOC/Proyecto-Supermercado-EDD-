@@ -25,6 +25,7 @@ public:
     
     // Saca un producto de la fila
     void eliminar(Product *product);
+    void eliminarPorCodigo(const std::string& barcode);
     
     int getSize() const;
     bool isEmpty() const;
