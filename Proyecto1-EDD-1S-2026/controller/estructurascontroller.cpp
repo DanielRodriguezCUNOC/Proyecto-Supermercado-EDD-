@@ -228,3 +228,18 @@ ListaGenerica<Product*>* EstructurasController::buscarPorNombre(const std::strin
 
     return resultados;
 }
+
+ListaGenerica<Product*>* EstructurasController::buscarPorCategoria(const std::string& categoria, long& tiempo)
+{
+    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
+    tiempo = 0;
+
+    if (arbolBPlus) {
+        auto start = std::chrono::high_resolution_clock::now();
+        arbolBPlus->buscarPorCategoriaLista(categoria, resultados);
+        auto end = std::chrono::high_resolution_clock::now();
+        tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+
+    return resultados;
+}

@@ -4,6 +4,7 @@
 #include <string>
 #include "../entidades/product.h"
 #include "../entidades/nodo.h"
+#include "listagenerica.h"
 
 // Nodo del Árbol B+
 // Si es una "hoja", guarda directamente los productos. 
@@ -39,6 +40,7 @@ public:
     // Funciones principales
     bool insertarProducto(const Product &producto, std::string &errorRollback);
     void buscarPorCategoria(const std::string &categoria, Nodo *&resultado) const;
+    void buscarPorCategoriaLista(const std::string &categoria, ListaGenerica<Product*>* resultados) const;
     bool eliminarProducto(const std::string &codigoBarra, std::string &errorRollback);
     
     // Funciones para exportar los datos y para hacer los dibujos molones (Graphviz).

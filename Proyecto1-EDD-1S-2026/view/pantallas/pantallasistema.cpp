@@ -304,6 +304,17 @@ void PantallaSistema::conectarPantallasConController()
                 buscarNombre, &PantallaBuscarPorNombre::mostrarResultados,
                 Qt::UniqueConnection);
     }
+
+    PantallaBuscarPorCategoria *buscarCategoria = findChild<PantallaBuscarPorCategoria *>();
+    if (buscarCategoria)
+    {
+        connect(buscarCategoria, &PantallaBuscarPorCategoria::buscarSolicitado,
+                appController, &AppController::buscarPorCategoria,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaCategoria,
+                buscarCategoria, &PantallaBuscarPorCategoria::mostrarResultados,
+                Qt::UniqueConnection);
+    }
 }
 
 void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)

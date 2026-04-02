@@ -34,9 +34,11 @@ public slots:
     void eliminarProducto(const QString& barcode);
     void cargarArchivoCSV(const QString &ruta);
     void buscarPorNombre(const QString& nombre);
+    void buscarPorCategoria(const QString& categoria);
 
 signals:
     void resultadosBusquedaNombre(ListaGenerica<Product*>* resultados, long tUL, long tOL, long tAVL);
+    void resultadosBusquedaCategoria(ListaGenerica<Product*>* resultados, long tiempo);
 };
 
 #endif // APPCONTROLLER_H

@@ -106,10 +106,16 @@ void AppController::cargarArchivoCSV(const QString &ruta)
     vistaSistema->mostrarDatosCSV(productos);
 }
 
-void AppController::buscarPorNombre(const QString &nombre)
+void AppController::buscarPorNombre(const QString& nombre)
 {
     long tUL = 0, tOL = 0, tAVL = 0;
-    ListaGenerica<Product*>* results = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
-    
-    emit resultadosBusquedaNombre(results, tUL, tOL, tAVL);
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
+    emit resultadosBusquedaNombre(resultados, tUL, tOL, tAVL);
+}
+
+void AppController::buscarPorCategoria(const QString& categoria)
+{
+    long tiempo = 0;
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorCategoria(categoria.toStdString(), tiempo);
+    emit resultadosBusquedaCategoria(resultados, tiempo);
 }
