@@ -37,6 +37,7 @@ private:
     
     NodoAVL* buscarRec(NodoAVL* root, const std::string& nombre) const;
     void inOrderRec(NodoAVL* root) const;
+    void obtenerTodoEnOrdenRec(NodoAVL* nodo, ListaGenerica<Product*>* resultados) const;
     void buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, ListaGenerica<Product*>* resultados) const;
     void destruirRec(NodoAVL* nodo);         // Limpia la memoria cuando ya no usamos el árbol
 
@@ -56,6 +57,9 @@ public:
     
     // Busca todos los productos que coincidan con un nombre
     void buscarPorNombreLista(const std::string& nombre, ListaGenerica<Product*>* resultados) const;
+
+    // Obtiene todos los productos ordenados por nombre
+    void obtenerTodoEnOrden(ListaGenerica<Product*>* resultados) const;
 
     // Genera el código para dibujar el árbol con Graphviz
     std::string generarDOT() const;

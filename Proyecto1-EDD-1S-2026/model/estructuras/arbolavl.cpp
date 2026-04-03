@@ -302,3 +302,15 @@ void ArbolAVL::buscarPorNombreRec(NodoAVL* nodo, const std::string& nombre, List
 void ArbolAVL::buscarPorNombreLista(const std::string& nombre, ListaGenerica<Product*>* resultados) const {
     buscarPorNombreRec(raiz, nombre, resultados);
 }
+
+void ArbolAVL::obtenerTodoEnOrdenRec(NodoAVL* nodo, ListaGenerica<Product*>* resultados) const {
+    if (nodo == nullptr) return;
+
+    obtenerTodoEnOrdenRec(nodo->izq, resultados);
+    resultados->insertar(new Product(nodo->producto));
+    obtenerTodoEnOrdenRec(nodo->der, resultados);
+}
+
+void ArbolAVL::obtenerTodoEnOrden(ListaGenerica<Product*>* resultados) const {
+    obtenerTodoEnOrdenRec(raiz, resultados);
+}

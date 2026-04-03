@@ -60,7 +60,8 @@
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: white</string>
+        <string notr="true">background-color: white;
+color: black;</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton">

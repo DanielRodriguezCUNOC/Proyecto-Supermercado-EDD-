@@ -341,6 +341,17 @@ void PantallaSistema::conectarPantallasConController()
                     this->actualizarTiempos(-1, -1, t, -1, -1);
                 });
     }
+
+    PantallaListarPorNombre *listarNombre = findChild<PantallaListarPorNombre *>();
+    if (listarNombre)
+    {
+        connect(listarNombre, &PantallaListarPorNombre::listarSolicitado,
+                appController, &AppController::listarPorNombre,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosListadoNombre,
+                listarNombre, &PantallaListarPorNombre::mostrarResultados,
+                Qt::UniqueConnection);
+    }
 }
 
 void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)

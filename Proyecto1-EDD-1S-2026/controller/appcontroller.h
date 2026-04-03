@@ -36,11 +36,13 @@ public slots:
     void buscarPorNombre(const QString& nombre);
     void buscarPorCategoria(const QString& categoria);
     void buscarPorRangoCaducidad(const QString& inicio, const QString& fin);
+    void listarPorNombre();
 
 signals:
     void resultadosBusquedaNombre(ListaGenerica<Product*>* resultados, long tUL, long tOL, long tAVL);
     void resultadosBusquedaCategoria(ListaGenerica<Product*>* resultados, long tiempo);
     void resultadosBusquedaRango(ListaGenerica<Product*>* resultados, long tiempo);
+    void resultadosListadoNombre(ListaGenerica<Product*>* resultados);
 };
 
 #endif // APPCONTROLLER_H

@@ -266,3 +266,10 @@ ListaGenerica<Product*>* EstructurasController::buscarPorRangoCaducidad(const st
 
     return resultados;
 }
+
+void EstructurasController::listarPorNombre(ListaGenerica<Product*>* resultados)
+{
+    if (arbolAVL && resultados) {
+        arbolAVL->obtenerTodoEnOrden(resultados);
+    }
+}

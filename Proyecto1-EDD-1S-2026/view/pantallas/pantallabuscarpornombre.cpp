@@ -99,7 +99,7 @@ void PantallaBuscarPorNombre::mostrarResultados(ListaGenerica<Product *> *result
             if (p)
             {
                 QFrame *card = new QFrame(this);
-                card->setStyleSheet("background-color: #F8F9F9; border: 1px solid #D5DBDB; border-radius: 5px; padding: 5px;");
+                card->setStyleSheet("background-color: #F8F9F9; color: Black; border: 1px solid #D5DBDB; border-radius: 5px; padding: 5px;");
 
                 QVBoxLayout *cardLayout = new QVBoxLayout(card);
                 QLabel *lblInfo = new QLabel(QString("<b>%1</b> (%2) - %3")

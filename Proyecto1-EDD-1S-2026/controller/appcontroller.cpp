@@ -127,3 +127,10 @@ void AppController::buscarPorRangoCaducidad(const QString& inicio, const QString
         inicio.toStdString(), fin.toStdString(), tiempo);
     emit resultadosBusquedaRango(resultados, tiempo);
 }
+
+void AppController::listarPorNombre()
+{
+    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
+    estructurasController->listarPorNombre(resultados);
+    emit resultadosListadoNombre(resultados);
+}
