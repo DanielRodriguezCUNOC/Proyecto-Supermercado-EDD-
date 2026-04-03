@@ -1,6 +1,7 @@
 #ifndef LISTAENLAZADAORDENADA_H
 #define LISTAENLAZADAORDENADA_H
 #include "model/entidades/nodo.h"
+#include "listagenerica.h"
 
 // Una lista donde los productos se acomodan automáticamente en orden alfabético
 class ListaEnlazadaOrdenada
@@ -24,12 +25,16 @@ public:
     
     // Saca un producto de la fila
     void eliminar(Product *product);
+    void eliminarPorCodigo(const std::string& barcode);
     
     int getSize() const;
     bool isEmpty() const;
     
     // Para dibujar la lista con Graphviz
     std::string generarDOT() const;
+    
+    // Busca todos los productos con el mismo nombre
+    void buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const;
 };
 
 #endif // LISTAENLAZADAORDENADA_H

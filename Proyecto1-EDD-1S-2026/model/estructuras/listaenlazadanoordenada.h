@@ -1,6 +1,7 @@
 #ifndef LISTAENLAZADANOORDENADA_H
 #define LISTAENLAZADANOORDENADA_H
 #include "model/entidades/nodo.h"
+#include "listagenerica.h"
 
 // Una lista simple donde los productos se guardan sin ningún orden en especial.
 // Solo se van agregando uno tras otro.
@@ -26,6 +27,7 @@ public:
     
     // Saca un producto de la fila
     void eliminar(Product *product);
+    void eliminarPorCodigo(const std::string& barcode);
     
     // Devuelve cuántos hay
     int getSize() const;
@@ -35,6 +37,9 @@ public:
     
     // Genera el código para dibujar la fila con Graphviz
     std::string generarDOT() const;
+    
+    // Busca todos los productos con el mismo nombre
+    void buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const;
 };
 
 #endif // LISTAENLAZADANOORDENADA_H

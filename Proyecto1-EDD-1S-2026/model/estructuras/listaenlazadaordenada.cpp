@@ -143,3 +143,27 @@ std::string ListaEnlazadaOrdenada::generarDOT() const {
     ss << "}\n";
     return ss.str();
 }
+
+void ListaEnlazadaOrdenada::buscarPorNombre(const std::string& nombre, ListaGenerica<Product*>* resultados) const {
+    Nodo* actual = cabeza;
+    while (actual) {
+        if (actual->getValue()->getName() == nombre) {
+            Product* p = new Product(*(actual->getValue()));
+            resultados->insertar(p);
+        } else if (actual->getValue()->getName() > nombre) {
+            break; // Como está ordenada, si ya nos pasamos en el abecedario, ya no hay más
+        }
+        actual = actual->getNext();
+    }
+}
+
+void ListaEnlazadaOrdenada::eliminarPorCodigo(const std::string& barcode) {
+    Nodo* actual = cabeza;
+    while (actual) {
+        if (actual->getValue()->getBarcode() == barcode) {
+            eliminar(actual->getValue());
+            return;
+        }
+        actual = actual->getNext();
+    }
+}

@@ -2,6 +2,7 @@
 #define ARBOLB_H
 
 #include "entidades/product.h"
+#include "listagenerica.h"
 #include <string>
 
 class Product;
@@ -67,56 +68,7 @@ public:
     void pedirPrestadoSiguiente(int idx);
     void fusionar(int idx);
 
-    /**
-     *  Efectúa una búsqueda recursiva limitada por dos cotas de caducidad.
-     *  desde Fecha mínima de la consulta.
-     *  hasta Fecha máxima de la consulta.
-     *  resultados Puntero a la estructura donde se anexarán las coincidencias halladas.
-     */
-    void buscarPorCaducidadRec(const std::string &desde, const std::string &hasta, class ListaResultados* resultados);
-};
-
-/**
- *  Estructura de soporte para albergar múltiples resultados de las consultas.
- */
-class NodoResultadoList {
-public:
-    Product producto;
-    NodoResultadoList* next;
-    NodoResultadoList(const Product& p) : producto(p), next(nullptr) {}
-};
-
-/**
- *  Lista enlazada que congrega el listado de todos los productos extraídos durante consultas del Árbol B.
- */
-class ListaResultados {
-public:
-    NodoResultadoList* cabeza;
-    NodoResultadoList* cola;
-    int size;
-
-    ListaResultados() : cabeza(nullptr), cola(nullptr), size(0) {}
-    ~ListaResultados() {
-        NodoResultadoList* actual = cabeza;
-        while(actual) {
-            NodoResultadoList* aux = actual->next;
-            delete actual;
-            actual = aux;
-        }
-    }
-    
-    /**
-     *  Incorpora un producto válidamente hallado al listado resultante final.
-     */
-    void agregar(const Product& p) {
-        NodoResultadoList* n = new NodoResultadoList(p);
-        if(!cabeza) cabeza = cola = n;
-        else {
-            cola->next = n;
-            cola = n;
-        }
-        size++;
-    }
+    void buscarPorRangoFechaRec(const std::string &inicio, const std::string &fin, ListaGenerica<Product*>* resultados);
 };
 
 /**
@@ -154,13 +106,7 @@ public:
      */
     std::string generarDOT() const;
     
-    /**
-     *  Consulta el inventario iterando sobre el espacio acotado por métricas temporales de caducidad.
-     *  desde Límite inferior para la cota temporal.
-     *  hasta Límite superior para la cota temporal.
-     * Retorna puntero a ListaResultados con las extracciones formales conformadas.
-     */
-    ListaResultados* buscarPorCaducidad(const std::string &desde, const std::string &hasta);
+    void buscarPorRangoFecha(const std::string &inicio, const std::string &fin, ListaGenerica<Product*>* resultados);
 
     /**
      *  Invoca el algoritmo de eliminación en cascada de balances, filtrado puramente por código abstracto.

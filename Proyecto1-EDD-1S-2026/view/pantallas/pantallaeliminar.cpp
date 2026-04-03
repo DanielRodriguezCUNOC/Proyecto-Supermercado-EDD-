@@ -29,3 +29,17 @@ PantallaEliminar::~PantallaEliminar()
 {
     delete ui;
 }
+
+void PantallaEliminar::on_btnEliminarConfirmar_clicked()
+{
+    QString barcode = ui->txtBarcodeEliminar->text();
+    if (barcode.isEmpty()) return;
+
+    emit productoEliminado(barcode);
+    ui->txtBarcodeEliminar->clear();
+}
+
+void PantallaEliminar::on_btnEliminarCancelar_clicked()
+{
+    ui->txtBarcodeEliminar->clear();
+}

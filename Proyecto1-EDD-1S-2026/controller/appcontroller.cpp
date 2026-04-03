@@ -31,6 +31,10 @@ AppController::AppController(QObject *parent) : QObject(parent)
     // Conectar actualización de estructuras con viewController para renderizar
     connect(estructurasController, &EstructurasController::etructurasActualizadas,
             viewController, &ViewController::actualizarVista);
+
+    // Conectar tiempos calculados con la vista principal
+    connect(estructurasController, &EstructurasController::tiemposCalculados,
+            vistaSistema, &PantallaSistema::actualizarTiempos);
 }
 
 AppController::~AppController()
@@ -68,10 +72,17 @@ void AppController::agregarProducto(const QString &nombre, const QString &codigo
         stock);
 }
 
+void AppController::eliminarProducto(const QString &barcode)
+{
+    estructurasController->eliminarProducto(barcode.toStdString());
+}
+
 void AppController::cargarArchivoCSV(const QString &ruta)
 {
     const QList<Product> productos = fileController->cargarCSV(ruta);
     qDebug() << "CSV cargado:" << ruta << "Productos válidos:" << productos.size();
+
+    estructurasController->reiniciarTiemposAcumulados();
 
     for (const Product &p : productos)
     {
@@ -85,10 +96,41 @@ void AppController::cargarArchivoCSV(const QString &ruta)
             p.getStock(),
             false); // No emitir señal por cada producto
     }
+
+    estructurasController->emitirTiemposAcumulados();
     
     // Actualizar arboles de una sola vez XD
     estructurasController->actualizarVistas();
     
     // Pasar los datos cargados a la tabla qlera
     vistaSistema->mostrarDatosCSV(productos);
+}
+
+void AppController::buscarPorNombre(const QString& nombre)
+{
+    long tUL = 0, tOL = 0, tAVL = 0;
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorNombre(nombre.toStdString(), tUL, tOL, tAVL);
+    emit resultadosBusquedaNombre(resultados, tUL, tOL, tAVL);
+}
+
+void AppController::buscarPorCategoria(const QString& categoria)
+{
+    long tiempo = 0;
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorCategoria(categoria.toStdString(), tiempo);
+    emit resultadosBusquedaCategoria(resultados, tiempo);
+}
+
+void AppController::buscarPorRangoCaducidad(const QString& inicio, const QString& fin)
+{
+    long tiempo = 0;
+    ListaGenerica<Product*>* resultados = estructurasController->buscarPorRangoCaducidad(
+        inicio.toStdString(), fin.toStdString(), tiempo);
+    emit resultadosBusquedaRango(resultados, tiempo);
+}
+
+void AppController::listarPorNombre()
+{
+    ListaGenerica<Product*>* resultados = new ListaGenerica<Product*>();
+    estructurasController->listarPorNombre(resultados);
+    emit resultadosListadoNombre(resultados);
 }

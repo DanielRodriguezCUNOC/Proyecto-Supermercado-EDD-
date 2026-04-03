@@ -17,6 +17,13 @@ public:
 
 private:
     Ui::PantallaEliminar *ui;
+
+private slots:
+    void on_btnEliminarConfirmar_clicked();
+    void on_btnEliminarCancelar_clicked();
+
+signals:
+    void productoEliminado(const QString& barcode);
 };
 
 #endif // PANTALLAELIMINAR_H

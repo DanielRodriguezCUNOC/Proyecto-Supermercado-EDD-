@@ -211,37 +211,45 @@ bool ArbolBPlus::insertarProducto(const Product &producto, std::string &errorRol
     return true;
 }
 
-void ArbolBPlus::buscarPorCategoria(const std::string &categoria, Nodo *&resultado) const
+#include "listagenerica.h"
+
+void ArbolBPlus::buscarPorCategoriaLista(const std::string &categoria, ListaGenerica<Product*>* resultados) const
 {
-    resultado = nullptr;
-    if (!raiz) return;
+    if (!raiz || !resultados) return;
 
     // Navegar hacia abajo hasta tocar fondo (la hoja base)
     BPlusNode *actual = raiz;
     while (!actual->esHoja) {
         int i = 0;
         // Caminamos hasta encontrar la ruta indicada (menor al hijo siguiente)
+        // Usamos >= porque en insertarRec usamos >= para decidir por qué hijo bajar si la clave coincide
         while (i < actual->numClaves && categoria >= actual->claves[i]) i++;
         actual = actual->hijos[i];
     }
 
     // Ya en la hoja, buscamos a mano entre los vecinos de esa hoja
-    for (int i = 0; i < actual->numClaves; ++i) {
-        if (actual->claves[i] == categoria) {
-            // Copiamos la lista de resultados para que el que busque 
-            // no rompa nuestro árbol de pura casualidad (por si la vacía o modifica).
-            Nodo *lista = actual->productos[i];
-            Nodo *prev_copia = nullptr;
-            while (lista) {
-                Nodo *copia = new Nodo(new Product(*lista->getValue()));
-                if (!resultado) resultado = copia;
-                if (prev_copia) prev_copia->setNext(copia);
-                copia->setPrev(prev_copia);
-                prev_copia = copia;
-                lista = lista->getNext();
+    // Como las categorías están ordenadas, si encontramos la categoría
+    // recolectamos sus productos y terminamos.
+    while (actual) {
+        bool encontrada = false;
+        for (int i = 0; i < actual->numClaves; ++i) {
+            if (actual->claves[i] == categoria) {
+                // Recolectamos todos los productos de esta lista
+                Nodo *lista = actual->productos[i];
+                while (lista) {
+                    // Creamos una copia del producto para el resultado
+                    resultados->insertar(new Product(*lista->getValue()));
+                    lista = lista->getNext();
+                }
+                encontrada = true;
+                break; // No hace falta buscar más en esta hoja
+            } else if (actual->claves[i] > categoria) {
+                // Como están ordenadas, si ya nos pasamos, no existe
+                return;
             }
-            return;
         }
+        if (encontrada) return; // Ya recolectamos todo lo de esa categoría
+        actual = actual->siguienteHoja;
     }
 }
 

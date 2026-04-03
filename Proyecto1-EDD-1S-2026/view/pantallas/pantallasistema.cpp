@@ -185,6 +185,12 @@ PantallaSistema::~PantallaSistema()
     delete ui;
 }
 
+void PantallaSistema::setAppController(AppController *controller)
+{
+    appController = controller;
+    conectarPantallasConController();
+}
+
 void PantallaSistema::actualizarReloj()
 {
     QTime hora = QTime::currentTime();
@@ -229,12 +235,8 @@ void PantallaSistema::inicializarPantallas()
     ui->stackedWidget->addWidget(buscarRango);
     ui->stackedWidget->addWidget(listarNombre);
 
-    // Conectar al controlador principal
-    if (appController)
-    {
-        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
-                appController, &AppController::agregarProducto);
-    }
+        // Intenta conectar inmediatamente; si el controller aun no existe, se conecta al llamar setAppController().
+        conectarPantallasConController();
 
     // Conectar botones a los cambios de pantalla
 
@@ -267,6 +269,89 @@ void PantallaSistema::inicializarPantallas()
 
     // Pantalla inicial visible
     ui->stackedWidget->setCurrentWidget(mostrarCSV);
+}
+
+void PantallaSistema::conectarPantallasConController()
+{
+    if (!appController)
+    {
+        return;
+    }
+
+    PantallaEliminar *eliminarProducto = findChild<PantallaEliminar *>();
+    PantallaBuscarPorNombre *buscarNombre = findChild<PantallaBuscarPorNombre *>();
+    PantallaBuscarPorCategoria *buscarCategoria = findChild<PantallaBuscarPorCategoria *>();
+    PantallaBuscarPorRangoCaducidad *buscarRango = findChild<PantallaBuscarPorRangoCaducidad *>();
+
+    if (agregarProducto)
+    {
+        connect(agregarProducto, &PantallaAgregarProducto::productoAgregado,
+                appController, &AppController::agregarProducto,
+                Qt::UniqueConnection);
+    }
+
+    if (eliminarProducto)
+    {
+        connect(eliminarProducto, &PantallaEliminar::productoEliminado,
+                appController, &AppController::eliminarProducto,
+                Qt::UniqueConnection);
+    }
+
+    if (buscarNombre)
+    {
+        connect(buscarNombre, &PantallaBuscarPorNombre::buscarSolicitado,
+                appController, &AppController::buscarPorNombre,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaNombre,
+                buscarNombre, &PantallaBuscarPorNombre::mostrarResultados,
+                Qt::UniqueConnection);
+        // Connect name search times to system labels
+        connect(appController, &AppController::resultadosBusquedaNombre,
+                [this](ListaGenerica<Product*>* r, long ul, long ol, long avl) {
+                    this->actualizarTiempos(ul, ol, -1, -1, avl);
+                });
+    }
+
+    if (buscarCategoria)
+    {
+        connect(buscarCategoria, &PantallaBuscarPorCategoria::buscarSolicitado,
+                appController, &AppController::buscarPorCategoria,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaCategoria,
+                buscarCategoria, &PantallaBuscarPorCategoria::mostrarResultados,
+                Qt::UniqueConnection);
+        // Connect category search time (B+)
+        connect(appController, &AppController::resultadosBusquedaCategoria,
+                [this](ListaGenerica<Product*>* r, long t) {
+                    this->actualizarTiempos(-1, -1, -1, t, -1);
+                });
+    }
+
+    if (buscarRango)
+    {
+        connect(buscarRango, &PantallaBuscarPorRangoCaducidad::buscarSolicitado,
+                appController, &AppController::buscarPorRangoCaducidad,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosBusquedaRango,
+                buscarRango, &PantallaBuscarPorRangoCaducidad::mostrarResultados,
+                Qt::UniqueConnection);
+        // Connect range search time (B)
+        connect(appController, &AppController::resultadosBusquedaRango,
+                [this](ListaGenerica<Product*>* r, long t) {
+                    this->actualizarTiempos(-1, -1, t, -1, -1);
+                });
+    }
+
+    PantallaListarPorNombre *listarNombre = findChild<PantallaListarPorNombre *>();
+    if (listarNombre)
+    {
+        connect(listarNombre, &PantallaListarPorNombre::listarSolicitado,
+                appController, &AppController::listarPorNombre,
+                Qt::UniqueConnection);
+        connect(appController, &AppController::resultadosListadoNombre,
+                listarNombre, &PantallaListarPorNombre::mostrarResultados,
+                Qt::UniqueConnection);
+    }
 }
 
 void PantallaSistema::mostrarDatosCSV(const QList<Product>& productos)
@@ -302,4 +387,14 @@ QGraphicsView *PantallaSistema::getViewArbolAVL()
     return ui ? ui->gvArbolAVL : nullptr;
     // Si da clavos descomentar esta línea y comentar la de arriba, es un parche temporal para evitar que se caiga la aplicación al no tener implementada la vista del AVL
     // return nullptr;
+}
+
+void PantallaSistema::actualizarTiempos(long ul, long ol, long b, long bp, long avl)
+{
+    if (!ui) return;
+    if (ul != -1) ui->lblTiempoUL->setText(QString("Tiempo: %1 µs").arg(ul));
+    if (ol != -1) ui->lblTiempoOL->setText(QString("Tiempo: %1 µs").arg(ol));
+    if (b != -1) ui->lblTiempoB->setText(QString("Tiempo: %1 µs").arg(b));
+    if (bp != -1) ui->lblTiempoBPlus->setText(QString("Tiempo: %1 µs").arg(bp));
+    if (avl != -1) ui->lblTiempoAVL->setText(QString("Tiempo: %1 µs").arg(avl));
 }

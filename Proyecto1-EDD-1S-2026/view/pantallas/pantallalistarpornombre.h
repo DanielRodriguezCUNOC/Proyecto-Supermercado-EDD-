@@ -15,7 +15,14 @@ public:
     explicit PantallaListarPorNombre(QWidget *parent = nullptr);
     ~PantallaListarPorNombre();
 
+public slots:
+    void mostrarResultados(ListaGenerica<Product*>* resultados);
+
+signals:
+    void listarSolicitado();
+
 private:
+    void limpiarResultados();
     Ui::PantallaListarPorNombre *ui;
 };
 
